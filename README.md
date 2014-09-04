@@ -1,3 +1,4 @@
+![logo](https://avatars3.githubusercontent.com/u/8652189?v=2&s=200)
 # Ospaf Documentation
 
 ## Welcome 
