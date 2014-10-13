@@ -1,5 +1,6 @@
 ![logo](https://avatars3.githubusercontent.com/u/8652189?v=2&s=200)
 # Ospaf Documentation
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/ospaf/ospaf-primary?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Welcome 
 
