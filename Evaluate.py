@@ -10,8 +10,17 @@ def get_repo_info(repo_name):
      repo_dic=MachineLearning.ML_Tools.log.loge(repo_dic)
      return repo_dic
 
+def read_model():
+   fr=open(config.dataset_root+'/model.txt')
+   dic={}
+   for i in fr.readlines():
+	  	dic[i.split('\t')[0].strip()]=float(i.split('\t')[1].strip())
+    
+   return dic
+
+
 def evaluate(repo_name):
-	dic_model=Get_Model.get_model()
+	dic_model=read_model()
 	dic_target=get_repo_info(repo_name)
 	factor=dic_model['constant'] 
 	for i in config.feat:
@@ -27,4 +36,6 @@ def get_score(repo_name):
 
 
 
-print get_score('jimenbian/DataMining')
+
+if __name__ == '__main__':
+	print get_score('jimenbian/DataMining')
