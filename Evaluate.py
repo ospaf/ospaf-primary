@@ -3,6 +3,7 @@ import MachineLearning.ML_Tools.sigmond
 import DataManager.GetRepoInfo
 import Get_Model
 import config
+import json
 
 def get_repo_info(repo_name):
      repo_dic={}
@@ -34,8 +35,14 @@ def get_score(repo_name):
      ful_name='https://api.github.com/repos/'+repo_name
      return (MachineLearning.ML_Tools.sigmond.sig((evaluate(ful_name))))*100
 
+def call_back_json(repo_name):
+     dic={
+       'name': '%s'%(repo_name),
+       'score':'%f'%(get_score(repo_name))
 
+     }
+     return json.dumps(dic)
 
 
 if __name__ == '__main__':
-	print get_score('jimenbian/DataMining')
+	print call_back_json('jimenbian/DataMining')
