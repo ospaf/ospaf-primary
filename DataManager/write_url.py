@@ -10,7 +10,7 @@ sys.path.append("..")
 import config
 
 def GetUrl(num):
-  if config.pattern=='debug':
+  
     fr=open(config.dataset_root+'/url.txt','a') 
     str = os.popen("curl -G https://api.github.com/repositories?since=%d"%(num)).read()
     pattern = '"url"'
@@ -26,11 +26,10 @@ def GetUrl(num):
           
     fr.close()          
     return list      
-  else:
-    pass
+ 
 
-# 
+
 if __name__=='__main__':
 # #      str = os.popen("curl -G https://api.github.com/repositories?since=50").read()
-        print GetUrl(50)
+        print GetUrl(150000)
       

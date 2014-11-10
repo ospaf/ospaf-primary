@@ -16,8 +16,8 @@ def loadDataSet():
     fr=open(config.dataset_root+'/dataset.txt') 
     for line in fr.readlines():
         lineArr = line.strip().split()
-        dataMat.append([1,float(lineArr[1]), float(lineArr[2]),float(lineArr[3]),float(lineArr[4]),float(lineArr[5]),float(lineArr[6]),float(lineArr[7]),float(lineArr[8]),float(lineArr[9]),float(lineArr[10]),float(lineArr[11]),float(lineArr[12]),float(lineArr[13]),float(lineArr[14]),float(lineArr[15]),float(lineArr[16]),float(lineArr[17]),float(lineArr[18]),float(lineArr[19]),float(lineArr[20]),float(lineArr[21]),float(lineArr[22]),float(lineArr[23])])
-        labelMat.append(int(lineArr[24]))
+        dataMat.append([1,float(lineArr[1]), float(lineArr[2]),float(lineArr[3]),float(lineArr[4]),float(lineArr[5]),float(lineArr[6]),float(lineArr[7]),float(lineArr[8]),float(lineArr[9]),float(lineArr[10]),float(lineArr[11]),float(lineArr[12]),float(lineArr[13]),float(lineArr[14]),float(lineArr[15]),float(lineArr[16]),float(lineArr[17]),float(lineArr[18]),float(lineArr[19]),float(lineArr[20]),float(lineArr[21]),float(lineArr[22]),float(lineArr[23]),float(lineArr[24]),float(lineArr[25]),float(lineArr[26])])
+        labelMat.append(int(lineArr[27]))
     dataMat=ML_Tools.log.loge(dataMat)
     #dataMat=ML_Tools.AutoNorm.AutoNorm(dataMat)
     return dataMat,labelMat

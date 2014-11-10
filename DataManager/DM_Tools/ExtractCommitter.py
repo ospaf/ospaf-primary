@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014年11月4日
-
 @author: zhanghb
 '''
 import json
@@ -77,4 +76,5 @@ def total_CommitSum(url,*TimeList):
                 CommitNum[UnSortedList.index(SortedList[i])]+=1
             else:
                 pass
-    return  CommitNum    
+    return  CommitNum 
+#print div_CommitSum('https://api.github.com/repos/jimenbian/DataMining/commits')       

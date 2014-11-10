@@ -6,7 +6,7 @@ import os
 sys.path.append("..")
 import config
 
-def GetUrl(data_num):
+def Insert_neg_data(data_num):
     fr=open(config.dataset_root+'/url.txt') 
     fr1=open(config.dataset_root+'/dataset.txt','a')
     j=0
@@ -27,4 +27,4 @@ def GetUrl(data_num):
           break
         
               
-GetUrl(5)        
+Insert_neg_data(5)        
