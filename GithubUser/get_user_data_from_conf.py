@@ -44,13 +44,27 @@ def send_request(gh_user_id, i):
 
 def main():
     conf_len = len(sys.argv)
-    if (conf_len == 2):
+    if (conf_len >= 2):
         conf_file = sys.argv[1]
     else:
         conf_file = "config"
 
+    if (conf_len >= 4):
+        begin = sys.argv[2]
+        end = sys.argv[3]
+    else:
+        begin = 0
+        end = 10000000
+    i = 0
+
     fo = open(conf_file, "r")
     for line in fo.readlines():
+        i++
+        if (i > end):
+            break
+        elif (i < begin):
+            continue
+    
         line = line.strip()                             
         if not len(line) or line.startswith('#'):       
             continue            

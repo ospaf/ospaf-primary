@@ -10,7 +10,7 @@
  - Command: python generate_logins.py > new_file
  - Output: new_file
 + Get user details by using 'get_user_data_from_conf.py'
- - Command: python get_user_data_from_conf.py new_file
+ - Command: python get_user_data_from_conf.py new_file begin_at end_with
  - API Details: "https://api.github.com/users/"+`gh_user_id`
  - Output: save to lots of `gh_user_id`.txt
 
