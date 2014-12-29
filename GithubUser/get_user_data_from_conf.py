@@ -59,7 +59,7 @@ def main():
 
     fo = open(conf_file, "r")
     for line in fo.readlines():
-        i++
+        i += 1
         if (i > end):
             break
         elif (i < begin):
