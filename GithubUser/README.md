@@ -14,5 +14,9 @@
  - API Details: "https://api.github.com/users/"+`gh_user_id`
  - Output: save to lots of `gh_user_id`.txt
 
++ Get user details by distribute the task ! 'task_distribute.py'
+ - Command: python task_distribute.py
+ - simply, we can edit the configuration files in task_distribute.py
+
 - - -
 Copyright 2014 Ospaf Lab Software, Inc. Unless otherwise marked, this work is licensed under a [Creative Commons Attribution 3.0 Unported License](http://creativecommons.org/licenses/by/3.0/).
