@@ -18,5 +18,8 @@
  - Command: python task_distribute.py
  - simply, we can edit the configuration files in task_distribute.py
 
+# Clean the downloaded users 'clean_thread.py'
+ - Command: python clean_thread.py 0 > 0_to_50.new
+
 - - -
 Copyright 2014 Ospaf Lab Software, Inc. Unless otherwise marked, this work is licensed under a [Creative Commons Attribution 3.0 Unported License](http://creativecommons.org/licenses/by/3.0/).
