@@ -21,5 +21,10 @@
 # Clean the downloaded users 'clean_thread.py'
  - Command: python clean_thread.py 0 > 0_to_50.new
 
+# Send data to mongodb
+ - Command: python upload_data.py
+ - Explain: each user file is in  a single.txt which is bad design...
+            Cause my ext3 inode issue which is a good lesson to me!
+
 - - -
 Copyright 2014 Ospaf Lab Software, Inc. Unless otherwise marked, this work is licensed under a [Creative Commons Attribution 3.0 Unported License](http://creativecommons.org/licenses/by/3.0/).
