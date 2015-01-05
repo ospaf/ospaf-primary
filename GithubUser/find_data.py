@@ -1,7 +1,7 @@
 import base64
 import json
 import re
-
+from os import walk
 import pymongo
 from pymongo import MongoClient
 
@@ -15,13 +15,25 @@ def init_db ():
     dc = client[_db_name][_db_collection]
     return dc
 
+def read_conf ():
+    special_file = ["location", "company", "login", "name", "email"]
+    conf_db = []
+    for item in special_file:
+        fo = open("./conf/"+item)
+        item_list = []
+        for line in fo.readlines():
+            line = line.strip()
+            if not len(line):
+                continue
+            elif line.startswith('#'):
+                continue
+            else:
+                item_list.append(line)
+        conf_db.append({"name": item, "value": item_list})
+    return conf_db
+    
 def reg_condition ():
-    conf_db = [{"name": "location", "value": ["china", "chinese", "peking", "chengdu"]},
-               {"name": "company", "value": ["china", "chinese", "peking", "chengdu"]},
-               {"name": "login", "value": ["liang", "wang", "chen", "xiong", "liu", "zhang", "wong", "zhou", "jiang"]},
-               {"name": "name", "value": ["liang", "wang", "chen", "xiong", "liu", "zhang", "wong", "zhou", "jiang"]},
-               {"name": "email", "value": ["qq.com", "163.com", "sina.com", "sohu.com"]}
-              ]
+    conf_db = read_conf()
     or_list = []
     for item in conf_db:
         str = ''
@@ -40,11 +52,6 @@ def reg_condition ():
 def main ():
     dc = init_db()
     if (dc) :
-        str = "china|chinese"
-        reg = re.compile(str, re.IGNORECASE)
-        loc1 = {"location": reg}
-        location01 = "location"
-        val = {"$or": [{location01: reg}]}
         val = reg_condition()
         result = dc.find(val)
         print result.count()
