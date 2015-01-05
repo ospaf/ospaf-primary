@@ -1,6 +1,7 @@
 import base64
 import json
 import re
+import sys
 from os import walk
 import pymongo
 from pymongo import MongoClient
@@ -15,7 +16,7 @@ def init_db ():
     dc = client[_db_name][_db_collection]
     return dc
 
-def read_conf ():
+def read_china_conf ():
     special_file = ["location", "company", "login", "name", "email"]
     conf_db = []
     for item in special_file:
@@ -32,8 +33,8 @@ def read_conf ():
         conf_db.append({"name": item, "value": item_list})
     return conf_db
     
-def reg_condition ():
-    conf_db = read_conf()
+def reg_china_condition ():
+    conf_db = read_china_conf()
     or_list = []
     for item in conf_db:
         str = ''
@@ -48,13 +49,37 @@ def reg_condition ():
     res = or_con
     return res
 
-
-def main ():
-    dc = init_db()
-    if (dc) :
-        val = reg_condition()
+# TODO not really useful now since it could be done easily by using mongo command
+def repo_condition(num):
+    res = {"public_repos": {"$gte" : num}}
+    return res
+    
+def command_process (dc, argv):
+    command = argv[1]
+    if command == "chinese":
+        val = reg_china_condition()
         result = dc.find(val)
         print result.count()
+    elif command == "repos":
+        if len(argv) < 3:
+            print "Please input the minim repos"
+            return
+        else:
+            val = repo_condition(long(sys.argv[2]))
+            result = dc.find(val)
+            print result.count()
+    else:
+        print "Not implemented yet or wrong command"
+        
+
+def main ():
+    if len(sys.argv) < 2:
+        print "Please enter the command"
+        return
+    dc = init_db()
+    if (dc):
+        command_process(dc, sys.argv)
+    else:
+        print "Cannot connect to database"
 
 main()
-
