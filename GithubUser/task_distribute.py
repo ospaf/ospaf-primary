@@ -83,6 +83,9 @@ def send_request(user_loop, dir, gh_user_login):
 
         try:
             res_data = urllib2.urlopen(req)
+        except urllib2.URLError, err:
+            print 'dliang url error'
+            return -404
         except urllib2.HTTPError, err:
             if err.code == 404:
                  return -404
@@ -120,13 +123,16 @@ def send_dir_request(task):
                 continue
             if (ret_val == -404):
                 continue
+            if (ret_val == -11):
+                print 'error ' + line
+                continue
 
 
 def init_task():
 #each dir, we start 5 tasks now!
     num = 5
     for item in dir_conf:
-        gap = item["total"]/5
+        gap = item["total"]/num
         for i in range(0, num):
             begin = i * gap
             if (i == (num -1)):
