@@ -23,6 +23,8 @@ for (dirpath, dirnames, filenames) in walk("./"):
             str = fo.read(1000000)
             fo.close()
             val = json.loads(str)
+# if we create index on 'id' and make it uniq, we can make it much more fast!
+# no need to find, just insert it
             new1 = dc.find_one({'id': val["id"]})
             if new1:
                 print "we already got it!"
