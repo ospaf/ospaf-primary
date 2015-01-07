@@ -105,7 +105,7 @@ def upload_user_followers(db, user_login):
 #we did the following judgement
 #in some of my cases, the user_id is not saved to our 'user' db
 #so the old_res_len is 0, in this case, we should update the 'follower' 
-        if (count <= old_res_len): 
+        if (old_res_len > 0) and (count <= old_res_len): 
             print "saved"
 #if saved, we could/update all his/her followers
 #In the future, we will not upload in this case
