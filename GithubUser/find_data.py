@@ -53,7 +53,27 @@ def reg_china_condition ():
 def repo_condition(num):
     res = {"public_repos": {"$gte" : num}}
     return res
-    
+
+def followers_get(num):
+    res = {"followers": {"$gte" : num}}
+    return res
+
+def created_date_count(date):
+    str = '^'+date
+    regex = re.compile(str)
+    res = {"created_at": regex}
+    return res
+
+def updated_date_count(date):
+    str = '^'+date
+    regex = re.compile(str)
+    res = {"updated_at": regex}
+    return res
+
+def id_count(min, max):
+    res = {"id": {"$gte": min, "$lt": max}}
+    return res
+
 def command_process (dc, argv):
     command = argv[1]
     if command == "chinese":
@@ -68,8 +88,67 @@ def command_process (dc, argv):
             val = repo_condition(long(sys.argv[2]))
             result = dc.find(val)
             print result.count()
+            return
+    elif command == "created_date":
+        if len(argv) < 3:
+            print "Please input the date like 2013-03-14"
+            return
+        else:
+            val = created_date_count(sys.argv[2])
+            result = dc.find(val)
+#print one example
+#            if (result > 0):
+#                print result[0]
+            print result.count()
+            return
+    elif command == "updated_date":
+        if len(argv) < 3:
+            print "Please input the date like 2013-03-14"
+            return
+        else:
+            val = updated_date_count(sys.argv[2])
+            result = dc.find(val)
+#print one example
+            if (result > 0):
+                print result[0]
+                print result.count()
+            else:
+                print "Empty"
+            return
+    elif command == "id":
+        if len(argv) < 4:
+            print "Please input the begin id and end id"
+            return
+        else:
+            val = id_count(long(sys.argv[2]), long(sys.argv[3]))
+            result = dc.find(val)
+#print one example
+            if (result > 0):
+                print result[0]
+                print result.count()
+            else:
+                print "Empty"
+            return
+    elif command == "followers":
+        if len(argv) < 3:
+            print "Please input the minim followers"
+            return
+        else:
+            val = followers_get(long(sys.argv[2]))
+            result = dc.find(val)
+#print one example
+            if (result > 0):
+                for item in result:
+                    print item["login"]
+                print result.count()
+            else:
+                print "Empty"
+            return
+           
     else:
         print "Not implemented yet or wrong command"
+        return
+    return
         
 
 def main ():

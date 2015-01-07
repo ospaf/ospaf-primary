@@ -1,4 +1,5 @@
 import sys
+import threading
 
 import base64
 import json
@@ -8,15 +9,49 @@ import datetime
 import pymongo
 from pymongo import MongoClient
 
+user_thread = []
 # like the seeds
-# TODO should add some famous id 
-init_user = ["initlove"]
+# I got them by search followers > 500
+init_user = ["goldmansachs", "torvalds", "Seldaek", "cameronmcefee", "brianleroux", "chovy", 
+             "stuarthalloway", "rkh", "pjhyett", "qiao", "hadley", "schmitjoh", "wintercn",
+             "tmcw", "kriswallsmith", "JeffreyZhao", "fat", "mhartl", "botelho", "aslakhellesoy",
+             "eduardolundgren", "DmitryBaranovskiy", "phlipper", "JeffreyWay", "vczh", "avelino",
+             "wycats", "sjl", "Dinnerbone", "JEG2", "BradLarson", "sonyxperiadev"
+            ]
 
 user_pass = [
+    {"user":"githublover001", "password": "qwe123456", "count": 0},
+    {"user":"githublover002", "password": "qwe123456", "count": 0},
+    {"user":"githublover003", "password": "qwe123456", "count": 0},
+    {"user":"githublover004", "password": "qwe123456", "count": 0},
+    {"user":"githublover005", "password": "qwe123456", "count": 0},
+    {"user":"githublover006", "password": "qwe123456", "count": 0},
     {"user":"githublover007", "password": "qwe123456", "count": 0},
     {"user":"githublover008", "password": "qwe123456", "count": 0},
-    {"user":"githublover005", "password": "qwe123456", "count": 0},
-    {"user":"githublover006", "password": "qwe123456", "count": 0}
+    {"user":"githublover009", "password": "qwe123456", "count": 0},
+    {"user":"githublover010", "password": "qwe123456", "count": 0},
+    {"user":"githublover011", "password": "qwe123456", "count": 0},
+    {"user":"githublover012", "password": "qwe123456", "count": 0},
+    {"user":"githublover013", "password": "qwe123456", "count": 0},
+    {"user":"githublover014", "password": "qwe123456", "count": 0},
+    {"user":"githublover015", "password": "qwe123456", "count": 0},
+    {"user":"githublover016", "password": "qwe123456", "count": 0},
+    {"user":"githublover017", "password": "qwe123456", "count": 0},
+    {"user":"githublover018", "password": "qwe123456", "count": 0},
+    {"user":"githublover019", "password": "qwe123456", "count": 0},
+    {"user":"githublover020", "password": "qwe123456", "count": 0},
+    {"user":"githublover021", "password": "qwe123456", "count": 0},
+    {"user":"githublover022", "password": "qwe123456", "count": 0},
+    {"user":"githublover023", "password": "qwe123456", "count": 0},
+    {"user":"githublover024", "password": "qwe123456", "count": 0},
+    {"user":"githublover025", "password": "qwe123456", "count": 0},
+    {"user":"githublover026", "password": "qwe123456", "count": 0},
+    {"user":"githublover027", "password": "qwe123456", "count": 0},
+    {"user":"githublover028", "password": "qwe123456", "count": 0},
+    {"user":"githublover029", "password": "qwe123456", "count": 0},
+    {"user":"githublover030", "password": "qwe123456", "count": 0},
+    {"user":"githublover031", "password": "qwe123456", "count": 0},
+    {"user":"githublover032", "password": "qwe123456", "count": 0}
 ]
 
 def init_db ():
@@ -66,11 +101,6 @@ def user_followers_count(db, user_login):
     else:
         return -1
 
-def main():
-    db = init_db()
-#    user_login = "marguerite"
-    user_login = "initlove"
-    upload_user_followers(db, user_login)
     
 def upload_user_followers(db, user_login):
     need_update = 0
@@ -80,6 +110,7 @@ def upload_user_followers(db, user_login):
         res_len = len(res["followers"])
         if (count == res_len): 
             print "saved"
+#if saved, we don't update all his/her followers
             return
         else:
 # Check if we need to upload
@@ -97,7 +128,7 @@ def upload_user_followers(db, user_login):
     else:
         val = {"$set": {"update_date": datetime.datetime.utcnow(),
                         "followers": res}}
-        db["followers"].update({"login":user_login}, val})
+        db["followers"].update({"login":user_login}, val)
         print "update " + user_login
 
     for item in res:
@@ -120,4 +151,32 @@ def user_followers_list(db, user_login):
 
     return res
 
+
+
+class myThread (threading.Thread):
+    def __init__(self, db, login):
+        threading.Thread.__init__(self)
+        self.db = db
+        self.login = login
+    def run(self):
+        print "Starting " + self.login
+        upload_user_followers(self.db, self.login)
+        print "Exiting " + self.login
+
+def run_task():
+    for item in user_thread:
+        item.start()
+
+
+def main():
+    exitFlag = 0
+    db = init_db()
+    for item in init_user:
+        new_thread = myThread(db, item)
+        user_thread.append(new_thread)
+
+    run_task()
+
 main()
+
+
