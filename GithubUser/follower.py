@@ -10,14 +10,62 @@ import pymongo
 from pymongo import MongoClient
 
 user_thread = []
+
 # like the seeds
 # I got them by search followers > 500
-init_user = ["goldmansachs", "torvalds", "Seldaek", "cameronmcefee", "brianleroux", "chovy", 
-             "stuarthalloway", "rkh", "pjhyett", "qiao", "hadley", "schmitjoh", "wintercn",
-             "tmcw", "kriswallsmith", "JeffreyZhao", "fat", "mhartl", "botelho", "aslakhellesoy",
-             "eduardolundgren", "DmitryBaranovskiy", "phlipper", "JeffreyWay", "vczh", "avelino",
-             "wycats", "sjl", "Dinnerbone", "JEG2", "BradLarson", "sonyxperiadev"
-            ]
+init_user = [
+"bbatsov",
+"PaulKinlan",
+"lepture",
+"ivaynberg",
+"mitchellh",
+"schmittjoh",
+"akrabat",
+"yihui",
+"mojombo",
+"MartianZ",
+"SamyPesse",
+"chad",
+"maxogden",
+"sindresorhus",
+"passy",
+"numbbbbb",
+"philsturgeon",
+"bkeepers",
+"mubix",
+"raganwald",
+"evanw",
+"dhg",
+"nvie",
+"cheeaun",
+"magnars",
+"svenfuchs",
+"codegangsta",
+"igorw",
+"gregkh",
+"loiane",
+"jashkenas",
+"BrendanEich",
+"jakearchibald",
+"astaxie",
+"lexrus",
+"omz",
+"phuslu",
+"hueniverse",
+"progrium",
+"HenrikJoreteg",
+"al3x",
+"purcell",
+"fnando",
+"evanphx",
+"caitp",
+"kytrinyx",
+"toddmotto",
+"JakeWharton",
+"aaronsw",
+"defunkt",
+"tapajos"
+]
 
 user_pass = [
     {"user":"githublover001", "password": "qwe123456", "count": 0},
@@ -104,34 +152,44 @@ def user_followers_count(db, user_login):
     
 def upload_user_followers(db, user_login):
     need_update = 0
-    res = db["followers"].find_one({"login": user_login})
-    if res:
+# old res is in our db
+    old_res = db["followers"].find_one({"login": user_login})
+    if old_res:
         count = user_followers_count(db, user_login)
-        res_len = len(res["followers"])
-        if (count == res_len): 
+        old_res_len = len(old_res["followers"])
+#for followers more than 500, seems their followers changed very frequently...god
+        if (count == old_res_len): 
             print "saved"
-#if saved, we don't update all his/her followers
+#if saved, we could/update all his/her followers
+#In the future, we will not upload in this case
+#for now, we open it to get more followers info
+            in_long_run = 1
+            if in_long_run:
+                for item in old_res["followers"]:
+                    upload_user_followers(db, item["login"])
             return
         else:
 # Check if we need to upload
 # TODO  better one
+            print "user count " + str(count) +"\t follower saved " + str(old_res_len)
             need_update = 1
 
-    res = user_followers_list(db, user_login)
+# new res is updated by calling api
+    new_res = user_followers_list(db, user_login)
     if need_update == 0:
         val = {"login": user_login, 
-               "followers": res,
+               "followers": new_res,
                "update_date": datetime.datetime.utcnow()
               }
         db["followers"].insert(val)
         print "insert " + user_login
     else:
         val = {"$set": {"update_date": datetime.datetime.utcnow(),
-                        "followers": res}}
+                        "followers": new_res}}
         db["followers"].update({"login":user_login}, val)
         print "update " + user_login
 
-    for item in res:
+    for item in new_res:
         upload_user_followers(db, item["login"])
         
 
