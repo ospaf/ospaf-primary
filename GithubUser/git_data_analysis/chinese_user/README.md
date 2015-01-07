@@ -2,11 +2,12 @@
 
 ## based on github openAPI, basic authentication
 
-# git_data_prepare
-- A couple of tools to get data from github and insert into our database. (mongodb in my case)
+# How to run
+ - Command: python find_chinese_user.py
 
-# git_data_analysis
-- A couple of tools to do the research
+# dir conf - current conf file
+ - Explain: put location/company info into it to make an easy check
+ - TODO:   put more info to make it better
 
 - - -
 Copyright 2014 Ospaf Lab Software, Inc. Unless otherwise marked, this work is licensed under a [Creative Commons Attribution 3.0 Unported License](http://creativecommons.org/licenses/by/3.0/).

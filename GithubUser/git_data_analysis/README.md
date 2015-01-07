@@ -2,11 +2,13 @@
 
 ## based on github openAPI, basic authentication
 
-# git_data_prepare
-- A couple of tools to get data from github and insert into our database. (mongodb in my case)
+# Find data in mongodb
+ - Command: 'python find_data.py'
+ - Explain: some useful commands. same with using native mongodb
 
-# git_data_analysis
-- A couple of tools to do the research
+
+# each certain analysis put into its own dir.
+- TODO: add a lib one day
 
 - - -
 Copyright 2014 Ospaf Lab Software, Inc. Unless otherwise marked, this work is licensed under a [Creative Commons Attribution 3.0 Unported License](http://creativecommons.org/licenses/by/3.0/).
