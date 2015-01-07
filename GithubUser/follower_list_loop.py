@@ -122,6 +122,9 @@ def upload_user_followers(db, user_login):
             need_update = 1
 
 # new res is updated by calling api
+# TODO chould be improved since the 'count' is already got
+# use the {} val is better
+
     new_res = user_followers_list(db, user_login)
     if need_update == 0:
         val = {"login": user_login, 
