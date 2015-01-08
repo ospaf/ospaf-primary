@@ -113,7 +113,7 @@ def upload_user_repos(db, user_login):
         else:
 # Check if we need to upload
 # TODO  better one
-            print "user count " + str(count) +"\t follower saved " + str(old_res_len)
+            print "user count " + str(count) +"\t repo saved " + str(old_res_len)
             need_update = 1
 
 # new res is updated by calling api
@@ -123,16 +123,14 @@ def upload_user_repos(db, user_login):
     new_res = user_repos_list(db, user_login)
     if need_update == 0:
         val = {"login": user_login, 
-               "public_repos": len(new_res),
-               "repos_info": new_res,
+               "repos": new_res,
                "update_date": datetime.datetime.utcnow()
               }
         db["repos"].insert(val)
         print "insert " + user_login
     else:
         val = {"$set": {"update_date": datetime.datetime.utcnow(),
-                        "public_repos": len(new_res),
-                        "repos_info": new_res}}
+                        "repos": new_res}}
         db["repos"].update({"login":user_login}, val)
         print "update " + user_login
 
