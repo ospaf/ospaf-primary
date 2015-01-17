@@ -2,6 +2,7 @@ import base64
 import json
 import re
 import sys
+import datetime
 import pymongo
 from pymongo import MongoClient
 
@@ -23,32 +24,31 @@ def init_db ():
 # I have to use the string compare one..
 def find_by_month (db, month_str):
     query_str = '^'+month_str
-    regex = re.compile(query_str)
-    query_json = {"created_at": regex}
+#    regex = re.compile(query_str)
+#    query_json = {"created_at": regex}
+    query_json = {"created_at": month_str}
     
 # id ascending is equal to date ascending
 # TODO: is it faster? with 3 call, 2 of them is with limit?
-    res = db["chinese"].find(query_json).sort("id", pymongo.ASCENDING).limit(1)
-    res_first = res[0]
-
-    res = db["chinese"].find(query_json).sort("id", pymongo.DESCENDING).limit(1)
-    res_last = res[0]
-
-    res_len = db["chinese"].find({"id": {"$gte": res_first["id"], "$lte": res_last["id"]}}).count
-
-    answer = {"type": "chinese_monthly_amount", 
+    res = db["chinese"].find(query_json).sort("id", pymongo.ASCENDING)
+    res_len = res.count()
+    answer = {"type": "monthly_amount",
               "month": month_str,
               "total_public": res_len,
-              "first": {"id": res_first["id"], "login": res_first["login"]},
-              "last": {"id": res_last["id"], "login": res_last["login"]},
-              "id_between": long(res[0]["id"])-long(res[len-1]["id"]),
               "update_date": datetime.datetime.utcnow()
              }
+    if res_len > 0:
+        res_first = res[0]
+        res_last = res[res_len-1]
+        answer["first"] = {"id": res_first["id"], "login": res_first["login"]}
+        answer["last"] = {"id": res_last["id"], "login": res_last["login"]}
+
     print "\n----------------------\nMonth " + month_str
     print answer
     print   "----------------------\n"
 
-    need_update = 0
+# always update now
+    need_update = 1
     saved_res = db["research_result"].find_one({"type": "chinese_monthly_amount", "month": month_str})
     if saved_res:
 # most time it is right. only if github close/private lots of previous account in a short time

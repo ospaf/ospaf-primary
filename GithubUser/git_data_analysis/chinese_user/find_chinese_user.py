@@ -54,20 +54,13 @@ def add_chinese(db, item):
     if old_res:
         return
 
-    res = {"id": item["id"],
-           "login": item["login"],
-           "name": item["name"],
-           "location": item["location"],
-           "blog": item["blog"],
-           "email": item["email"],
-           "type": item["type"],
-           "public_repos": item["public_repos"],
-           "public_gists": item["public_gists"],
-           "followers": item["followers"],
-           "following": item["following"],
-           "created_at": item["created_at"],
-           "updated_at": item["updated_at"]
-          }
+    props = ["id", "login", "name", "location", "blog", "email", "type",
+            "public_repos", "public_gists", "followers", "following", 
+            "created_at", "updated_at"]
+    res = {}
+    for prop in props:
+        if item.has_key(prop):
+            res[prop] = item[prop]
     db["chinese"].insert(res)
 
 def main ():
@@ -79,6 +72,8 @@ def main ():
         for item in result:
             count += 1
             add_chinese(db, item)
+            if count%500 == 0:
+                print count
 
 #TODO make it a lib
         old_res = db["research_result"].find_one({"type": "chinese_count"})
