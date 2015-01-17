@@ -79,11 +79,13 @@ def main ():
         for item in result:
             count += 1
             add_chinese(db, item)
-        old_res = db["chinese"].find_one({"id": -1})
+
+#TODO make it a lib
+        old_res = db["research_result"].find_one({"type": "chinese_count"})
         if old_res and old_res["total_count"] != count:
-            db["chinese"].update({"$set": {"total_count": count}})
+            db["research_result"].update({"$set": {"total_count": count}})
         else:
-            db["chinese"].insert({"id": -1, "total_count": count})
+            db["research_result"].insert({"type": "chinese_count", "total_count": count})
     else:
         print "Cannot connect to database"
 

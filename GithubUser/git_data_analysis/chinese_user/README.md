@@ -14,5 +14,8 @@
  - Command: python monthly_chinese_user_amount.py
  - Explain: regist history
 
+# find_chinese_active.py
+ - Command: python find_chinese_active.py
+ - Explain: find the active chinese count
 - - -
 Copyright 2014 Ospaf Lab Software, Inc. Unless otherwise marked, this work is licensed under a [Creative Commons Attribution 3.0 Unported License](http://creativecommons.org/licenses/by/3.0/).
