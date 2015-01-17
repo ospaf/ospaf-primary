@@ -13,8 +13,8 @@ def init_db ():
     _db_collection = "user"
 
     client = MongoClient(_db_addr, _db_port)
-    dc = client[_db_name][_db_collection]
-    return dc
+    db = client[_db_name]
+    return db
 
 def read_china_conf ():
     special_file = ["location", "company", "login", "name", "email"]
@@ -49,12 +49,41 @@ def reg_china_condition ():
     res = or_con
     return res
 
+def add_chinese(db, item):
+    old_res = db["chinese"].find_one({"id": item["id"]})
+    if old_res:
+        return
+
+    res = {"id": item["id"],
+           "login": item["login"],
+           "name": item["name"],
+           "location": item["location"],
+           "blog": item["blog"],
+           "email": item["email"],
+           "type": item["type"],
+           "public_repos": item["public_repos"],
+           "public_gists": item["public_gists"],
+           "followers": item["followers"],
+           "following": item["following"],
+           "created_at": item["created_at"],
+           "updated_at": item["updated_at"]
+          }
+    db["chinese"].insert(res)
+
 def main ():
-    dc = init_db()
-    if (dc):
+    db = init_db()
+    if (db):
         val = reg_china_condition()
-        result = dc.find(val)
-        print result.count()
+        result = db["user"].find(val)
+        count = 0
+        for item in result:
+            count += 1
+            add_chinese(db, item)
+        old_res = db["chinese"].find_one({"id": -1})
+        if old_res and old_res["total_count"] != count:
+            db["chinese"].update({"$set": {"total_count": count}})
+        else:
+            db["chinese"].insert({"id": -1, "total_count": count})
     else:
         print "Cannot connect to database"
 
