@@ -28,15 +28,15 @@ def find_by_month (db, month_str):
     
 # id ascending is equal to date ascending
 # TODO: is it faster? with 3 call, 2 of them is with limit?
-    res = db["user"].find(query_json).sort("id", pymongo.ASCENDING).limit(1)
+    res = db["chinese"].find(query_json).sort("id", pymongo.ASCENDING).limit(1)
     res_first = res[0]
 
-    res = db["user"].find(query_json).sort("id", pymongo.DESCENDING).limit(1)
+    res = db["chinese"].find(query_json).sort("id", pymongo.DESCENDING).limit(1)
     res_last = res[0]
 
-    res_len = db["user"].find({"id": {"$gte": res_first["id"], "$lte": res_last["id"]}}).count
+    res_len = db["chinese"].find({"id": {"$gte": res_first["id"], "$lte": res_last["id"]}}).count
 
-    answer = {"type": "monthly_amount", 
+    answer = {"type": "chinese_monthly_amount", 
               "month": month_str,
               "total_public": res_len,
               "first": {"id": res_first["id"], "login": res_first["login"]},
@@ -49,7 +49,7 @@ def find_by_month (db, month_str):
     print   "----------------------\n"
 
     need_update = 0
-    saved_res = db["research_result"].find_one({"type": "monthly_amount", "month": month_str})
+    saved_res = db["research_result"].find_one({"type": "chinese_monthly_amount", "month": month_str})
     if saved_res:
 # most time it is right. only if github close/private lots of previous account in a short time
         if saved_res["total_public"] < res_len:
@@ -59,7 +59,7 @@ def find_by_month (db, month_str):
             return
 
     if need_update:
-        db["research_result"].update({"type":"monthly_amount", "month": month_str}, {"$set": answer})
+        db["research_result"].update({"type": "chinese_monthly_amount", "month": month_str}, {"$set": answer})
         print "The " + month_str + " result is updated"
     else:
         db["research_result"].insert(answer)
