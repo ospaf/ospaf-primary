@@ -12,7 +12,7 @@ from pymongo import MongoClient
           
 
 def init_db ():
-    _db_addr = "147.2.207.55"
+    _db_addr = "127.0.0.1"
     _db_port = 27017
     _db_name = "github"
 
@@ -47,8 +47,7 @@ def find_by_month (db, month_str):
     print answer
     print   "----------------------\n"
 
-# always update now
-    need_update = 1
+    need_update = 0
     saved_res = db["research_result"].find_one({"type": "chinese_monthly_amount", "month": month_str})
     if saved_res:
 # most time it is right. only if github close/private lots of previous account in a short time

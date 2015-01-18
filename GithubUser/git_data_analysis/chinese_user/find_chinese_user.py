@@ -7,7 +7,7 @@ import pymongo
 from pymongo import MongoClient
 
 def init_db ():
-    _db_addr = "147.2.207.55"
+    _db_addr = "127.0.0.1"
     _db_port = 27017
     _db_name = "github"
     _db_collection = "user"
