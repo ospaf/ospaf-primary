@@ -77,8 +77,8 @@ def main ():
 
 #TODO make it a lib
         old_res = db["research_result"].find_one({"type": "chinese_count"})
-        if old_res and old_res["total_count"] != count:
-            db["research_result"].update({"$set": {"total_count": count}})
+        if old_res:
+            db["research_result"].update({"type": "chinese_count"}, {"$set": {"total_count": count}})
         else:
             db["research_result"].insert({"type": "chinese_count", "total_count": count})
     else:

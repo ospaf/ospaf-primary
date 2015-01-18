@@ -7,7 +7,7 @@ import pymongo
 from pymongo import MongoClient
 
 def init_db ():
-    _db_addr = "147.2.207.55"
+    _db_addr = "127.0.0.1"
     _db_port = 27017
     _db_name = "github"
 
@@ -33,14 +33,15 @@ def main ():
     db = init_db()
     if (db):
         val = active_user(db)
-        count = db["chinese"].find(val).count()
+        count = db["user"].find(val).count()
 
+#        db["research_result"].remove({"type": "active_count"})
 #TODO make it a lib
-        old_res = db["research_result"].find_one({"type": "chinese_active_count"})
+        old_res = db["research_result"].find_one({"type": "active_count"})
         if old_res:
-            db["research_result"].update({"type": "chinese_active_count"}, {"$set": {"total_count": count}})
+            db["research_result"].update({"type": "active_count"},{"$set": {"total_count": count}})
         else:
-            db["research_result"].insert({"type": "chinese_active_count", "total_count": count})
+            db["research_result"].insert({"type": "active_count", "total_count": count})
     else:
         print "Cannot connect to database"
 
