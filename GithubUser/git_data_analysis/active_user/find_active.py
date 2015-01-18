@@ -35,6 +35,7 @@ def main ():
         val = active_user(db)
         count = db["user"].find(val).count()
 
+# .. demo of remove a record
 #        db["research_result"].remove({"type": "active_count"})
 #TODO make it a lib
         old_res = db["research_result"].find_one({"type": "active_count"})
