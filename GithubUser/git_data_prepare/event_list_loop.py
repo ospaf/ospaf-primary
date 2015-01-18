@@ -159,7 +159,8 @@ def fake():
         gap = total/thread_num
         print gap
         upload_user_event (db, "initlove")
-#main()
-fake()
+
+main()
+#fake()
 
 
