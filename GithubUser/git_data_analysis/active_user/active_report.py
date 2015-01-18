@@ -19,8 +19,8 @@ def init_db ():
     client = MongoClient(_db_addr, _db_port)
     return client[_db_name]
 
-def report_active(db):
-    saved_res = db["research_result"].find_one({"type": "active_count"})
+def report_active(db, type_name):
+    saved_res = db["research_result"].find_one({"type": type_name})
     if saved_res:
         print saved_res
     else:
@@ -29,7 +29,8 @@ def report_active(db):
 def main ():
     db = init_db()
     if (db):
-        report_active(db)
+        report_active(db, "active_count")
+        report_active(db, "active_count_3_month")
     else:
         print "Cannot connect to database"
 

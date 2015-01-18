@@ -4,6 +4,7 @@
 
 # Find active account in mongodb
  - Command: 'python find_active.py'
+ - Command: 'python find_active_last_3_month.py'
  - Explain: we can add more strick check
  - TODO...
 
