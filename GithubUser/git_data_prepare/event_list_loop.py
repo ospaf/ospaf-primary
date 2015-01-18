@@ -116,7 +116,7 @@ def upload_user_event(db, user_login):
     count = len(new_res["val"])
 
 #TODO add the event count is good for analysis
-    db["event"].insert({"login": user_login, "event": new_res["val"], "count": count})
+    db["event"].insert({"login": user_login, "event": new_res["val"], "count": count, "update_date": datetime.datetime.utcnow()})
 
 def user_event_list(db, user_login):
     res = []
