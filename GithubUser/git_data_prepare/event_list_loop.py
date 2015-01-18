@@ -1,6 +1,7 @@
 import sys
+import re
 import threading
-
+import socket
 import base64
 import json
 import urllib
@@ -69,6 +70,7 @@ def get_free_user():
 #    seems...Correct me if I were wrong
 def append_event(gh_user_id, page):
     url = "https://api.github.com/users/"+gh_user_id+"/events?page="+str(page);
+    print url
     req = urllib2.Request(url)
     i = get_free_user()
     username = user_pass[i]["user"]
@@ -126,6 +128,24 @@ def user_event_list(db, user_login):
 
     return res
 
+def active_date(date):
+# github just save the last three month, or we say, last 90 days.
+    active_month = ["2014-10", "2014-11", "2014-12", "2015-01"]
+    query_str = ''
+
+    for item in active_month:
+        if len(query_str) == 0:
+            query_str = "^" + item
+        else:
+            query_str = query_str + "|^" + item
+    reg = re.compile(query_str)
+    val = reg.search (date)
+    if val:
+        return 1
+    else:
+        return 0
+
+
 class myThread (threading.Thread):
     def __init__(self, db, start_id, end_id):
         threading.Thread.__init__(self)
@@ -139,7 +159,9 @@ class myThread (threading.Thread):
             dc = self.db["user"]
             result = dc.find_one({"id": i})
             if result:
-                upload_user_event(self.db, result["login"])
+                updated_date = result["updated_at"]
+                if active_date(updated_date):
+                    upload_user_event(self.db, result["login"])
             i += 1
         print "Exiting " + str(self.start_id)
 
@@ -176,6 +198,10 @@ def fake():
         print gap
         upload_user_event (db, "initlove")
 
+
+#seconds
+timeout = 60
+socket.setdefaulttimeout(timeout)
 main()
 #fake()
 
