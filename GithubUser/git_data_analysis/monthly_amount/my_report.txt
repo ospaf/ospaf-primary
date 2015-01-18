@@ -1,3 +1,5 @@
+#sometimes, id is big, but created at a very early time...
+#see the login 'tater'
 2007-10  <total_public 3> <id gap 611788>
 2007-11  <total_public 0> <id gap 0>
 2007-12  <total_public 0> <id gap 0>
