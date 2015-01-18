@@ -70,7 +70,7 @@ def get_free_user():
 #    seems...Correct me if I were wrong
 def append_event(gh_user_id, page):
     url = "https://api.github.com/users/"+gh_user_id+"/events?page="+str(page);
-    print url
+#    print url
     req = urllib2.Request(url)
     i = get_free_user()
     username = user_pass[i]["user"]
@@ -106,8 +106,7 @@ def upload_user_event(db, user_login):
 # old res is in our db
     old_res = db["event"].find_one({"login": user_login})
     if old_res:
-        count = old_res["event"]
-        db["event"].update({"login": user_login}, {"$set": {"update_date": datetime.datetime.utcnow(), "count": count}})
+# simply return it!
         return
 
     new_res = user_event_list(db, user_login)
@@ -115,6 +114,8 @@ def upload_user_event(db, user_login):
         return
     count = len(new_res["val"])
 
+    if count > 0:
+        print user_login + "added with " + str(count) + " counts"
 #TODO add the event count is good for analysis
     db["event"].insert({"login": user_login, "event": new_res["val"], "count": count, "update_date": datetime.datetime.utcnow()})
 
@@ -203,6 +204,13 @@ def fake():
         print gap
         upload_user_event (db, "initlove")
 
+def fix_event():
+    db = init_db()
+    res = db["event"].find()
+    for item in res:
+        count = len(item["event"])
+        db["event"].update({"login": item["login"]}, {"$set": {"update_date": datetime.datetime.utcnow(), "count": count}})
+    print "Finish"
 
 #seconds
 timeout = 60
