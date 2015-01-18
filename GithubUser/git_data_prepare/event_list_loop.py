@@ -80,7 +80,24 @@ def append_event(gh_user_id, page):
     res = res_data.read()
 
     val = json.loads(res)
-    return val
+
+    try:
+        res_data = urllib2.urlopen(req)
+    except urllib2.URLError, err:
+# TODO we should note this ...
+        print 'dliang url error'
+        return []
+    except urllib2.HTTPError, err:
+        print '404 error'
+        if err.code == 404:
+             return []
+    else:
+        res = res_data.read()
+        val = json.loads(res)
+        return val
+
+    print "How to get here?"
+    return []
 
 def upload_user_event(db, user_login):
     need_update = 0
@@ -90,7 +107,6 @@ def upload_user_event(db, user_login):
         return
 
     new_res = user_event_list(db, user_login)
-    print new_res
 
     if len(new_res) == 0:
        return
