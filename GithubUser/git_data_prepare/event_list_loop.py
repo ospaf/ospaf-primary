@@ -13,22 +13,6 @@ from pymongo import MongoClient
 user_thread = []
 
 user_pass = [
-    {"user":"githublover001", "password": "qwe123456", "count": 0},
-    {"user":"githublover002", "password": "qwe123456", "count": 0},
-    {"user":"githublover003", "password": "qwe123456", "count": 0},
-    {"user":"githublover004", "password": "qwe123456", "count": 0},
-    {"user":"githublover005", "password": "qwe123456", "count": 0},
-    {"user":"githublover006", "password": "qwe123456", "count": 0},
-    {"user":"githublover007", "password": "qwe123456", "count": 0},
-    {"user":"githublover008", "password": "qwe123456", "count": 0},
-    {"user":"githublover009", "password": "qwe123456", "count": 0},
-    {"user":"githublover010", "password": "qwe123456", "count": 0},
-    {"user":"githublover011", "password": "qwe123456", "count": 0},
-    {"user":"githublover012", "password": "qwe123456", "count": 0},
-    {"user":"githublover013", "password": "qwe123456", "count": 0},
-    {"user":"githublover014", "password": "qwe123456", "count": 0},
-    {"user":"githublover015", "password": "qwe123456", "count": 0},
-    {"user":"githublover016", "password": "qwe123456", "count": 0},
     {"user":"githublover017", "password": "qwe123456", "count": 0},
     {"user":"githublover018", "password": "qwe123456", "count": 0},
     {"user":"githublover019", "password": "qwe123456", "count": 0},
@@ -44,7 +28,23 @@ user_pass = [
     {"user":"githublover029", "password": "qwe123456", "count": 0},
     {"user":"githublover030", "password": "qwe123456", "count": 0},
     {"user":"githublover031", "password": "qwe123456", "count": 0},
-    {"user":"githublover032", "password": "qwe123456", "count": 0}
+    {"user":"githublover032", "password": "qwe123456", "count": 0},
+    {"user":"githublover001", "password": "qwe123456", "count": 0},
+    {"user":"githublover002", "password": "qwe123456", "count": 0},
+    {"user":"githublover003", "password": "qwe123456", "count": 0},
+    {"user":"githublover004", "password": "qwe123456", "count": 0},
+    {"user":"githublover005", "password": "qwe123456", "count": 0},
+    {"user":"githublover006", "password": "qwe123456", "count": 0},
+    {"user":"githublover007", "password": "qwe123456", "count": 0},
+    {"user":"githublover008", "password": "qwe123456", "count": 0},
+    {"user":"githublover009", "password": "qwe123456", "count": 0},
+    {"user":"githublover010", "password": "qwe123456", "count": 0},
+    {"user":"githublover011", "password": "qwe123456", "count": 0},
+    {"user":"githublover012", "password": "qwe123456", "count": 0},
+    {"user":"githublover013", "password": "qwe123456", "count": 0},
+    {"user":"githublover014", "password": "qwe123456", "count": 0},
+    {"user":"githublover015", "password": "qwe123456", "count": 0},
+    {"user":"githublover016", "password": "qwe123456", "count": 0}
 ]
 
 def init_db ():
@@ -88,32 +88,35 @@ def append_event(gh_user_id, page):
     except urllib2.URLError, err:
 # TODO we should note this ...
         print 'dliang url error'
-        return []
+        return {"error": 1}
     except urllib2.HTTPError, err:
         print '404 error'
         if err.code == 404:
-             return []
+             return {"error": 1}
     else:
         res = res_data.read()
         val = json.loads(res)
-        return val
+        return {"error": 0, "val": val}
 
     print "How to get here?"
-    return []
+    return {"error": 1}
 
 def upload_user_event(db, user_login):
     need_update = 0
 # old res is in our db
     old_res = db["event"].find_one({"login": user_login})
     if old_res:
+        count = old_res["event"]
+        db["event"].update({"login": user_login}, {"$set": {"update_date": datetime.datetime.utcnow(), "count": count}})
         return
 
     new_res = user_event_list(db, user_login)
+    if (new_res["error"] == 1):
+        return
+    count = len(new_res["val"])
 
-    if len(new_res) == 0:
-       return
-
-    db["event"].insert({"login": user_login, "event": new_res})
+#TODO add the event count is good for analysis
+    db["event"].insert({"login": user_login, "event": new_res["val"], "count": count})
 
 def user_event_list(db, user_login):
     res = []
@@ -121,12 +124,14 @@ def user_event_list(db, user_login):
     i = 1
     while 1:
         ret_val = append_event(user_login, i)
-        if len(ret_val) == 0:
+        if (ret_val["error"] == 1):
+            return {"error":1}
+        elif len(ret_val["val"]) == 0:
             break
-        res += ret_val
+        res += ret_val["val"]
         i += 1
 
-    return res
+    return {"error": 0, "val": res}
 
 def active_date(date):
 # github just save the last three month, or we say, last 90 days.
