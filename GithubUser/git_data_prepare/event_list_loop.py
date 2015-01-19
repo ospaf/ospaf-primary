@@ -92,6 +92,7 @@ def append_event(gh_user_id, page):
     except httplib.HTTPException, err:
         print 'http exception'
         return {"error": 1}
+# TODO timeout
     else:
         res = res_data.read()
         val = json.loads(res)
@@ -114,7 +115,7 @@ def upload_user_event(db, user_login):
     count = len(new_res["val"])
 
     if count > 0:
-        print user_login + "added with " + str(count) + " counts"
+        print user_login + " added with " + str(count) + " counts"
 #TODO add the event count is good for analysis
     db["event"].insert({"login": user_login, "event": new_res["val"], "count": count, "update_date": datetime.datetime.utcnow()})
 
@@ -125,6 +126,7 @@ def user_event_list(db, user_login):
 #    print "User event " + user_login + " begin"
     while 1:
         ret_val = append_event(user_login, i)
+#FIXME: what if we received page1 and get error in page2
         if (ret_val["error"] == 1):
             return {"error":1}
         elif len(ret_val["val"]) == 0:
@@ -187,7 +189,7 @@ def main():
         print gap
 
         for i in range(0, thread_num):
-            start_id = i * gap
+            start_id = i * gap + 130000
             if i == (thread_num - 1):
                 end_id = total
             else:
