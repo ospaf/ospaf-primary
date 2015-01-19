@@ -78,11 +78,6 @@ def append_event(gh_user_id, page):
     base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
     req.add_header("Authorization", "Basic %s" % base64string)   
 
-    res_data = urllib2.urlopen(req)
-    res = res_data.read()
-
-    val = json.loads(res)
-
     try:
         res_data = urllib2.urlopen(req)
     except urllib2.URLError, err:
@@ -123,6 +118,7 @@ def user_event_list(db, user_login):
     res = []
 # 30 is github system defined
     i = 1
+    print "User event " + user_login + " begin"
     while 1:
         ret_val = append_event(user_login, i)
         if (ret_val["error"] == 1):
@@ -132,6 +128,7 @@ def user_event_list(db, user_login):
         res += ret_val["val"]
         i += 1
 
+    print "User event " + user_login + " end"
     return {"error": 0, "val": res}
 
 def active_date(date):
