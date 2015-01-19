@@ -4,6 +4,7 @@ import threading
 import socket
 import base64
 import json
+import httplib
 import urllib
 import urllib2
 import datetime
@@ -88,6 +89,9 @@ def append_event(gh_user_id, page):
         print '404 error'
         if err.code == 404:
              return {"error": 1}
+    except httplib.HTTPException, err:
+        print 'http exception'
+        return {"error": 1}
     else:
         res = res_data.read()
         val = json.loads(res)
@@ -118,7 +122,7 @@ def user_event_list(db, user_login):
     res = []
 # 30 is github system defined
     i = 1
-    print "User event " + user_login + " begin"
+#    print "User event " + user_login + " begin"
     while 1:
         ret_val = append_event(user_login, i)
         if (ret_val["error"] == 1):
@@ -128,7 +132,7 @@ def user_event_list(db, user_login):
         res += ret_val["val"]
         i += 1
 
-    print "User event " + user_login + " end"
+#    print "User event " + user_login + " end"
     return {"error": 0, "val": res}
 
 def active_date(date):
