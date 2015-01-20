@@ -1,3 +1,6 @@
+#This is used to make 'date' related operation faster
+#We can use real datetime though...
+
 import sys
 sys.path.append("../../..")
 import re
@@ -18,7 +21,6 @@ def date_string_to_int(date_string):
     num = int(date_string[0:4])*10000+int(date_string[5:7])*100+int(date_string[8:10])
     return num
 
-#This is used to make 'date' related operation faster
 def fix_event():
     db = DMDatabase().getDB()
 
