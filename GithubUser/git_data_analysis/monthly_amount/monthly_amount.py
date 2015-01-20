@@ -2,23 +2,17 @@ import base64
 import json
 import re
 import sys
+sys.path.append("../../..")
 import datetime
 import pymongo
 from pymongo import MongoClient
+
+from GithubUser.DMLib.DMDatabase import DMDatabase
 
 # The first user is mojombo, id == 1, created: 2007-10-20
 
 # The very late one is githublover001 id == 10293416 updated: 2015-01-06
           
-
-def init_db ():
-    _db_addr = "127.0.0.1"
-    _db_port = 27017
-    _db_name = "github"
-
-    client = MongoClient(_db_addr, _db_port)
-    return client[_db_name]
-
 # month_str is something like 2010-04
 # since I did not change the date from 'string' to 'date'
 # I have to use the string compare one..
@@ -84,7 +78,8 @@ def calculate_months(db):
             find_by_month(db, month_str)
 
 def main ():
-    db = init_db()
+    dm_db = DMDatabase()
+    db = dm_db.getDB()
     if (db):
         calculate_months(db)
     else:

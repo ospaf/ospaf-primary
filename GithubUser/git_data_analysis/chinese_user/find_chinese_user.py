@@ -2,19 +2,11 @@ import base64
 import json
 import re
 import sys
+sys.path.append("../../..")
 from os import walk
 import pymongo
 from pymongo import MongoClient
-
-def init_db ():
-    _db_addr = "127.0.0.1"
-    _db_port = 27017
-    _db_name = "github"
-    _db_collection = "user"
-
-    client = MongoClient(_db_addr, _db_port)
-    db = client[_db_name]
-    return db
+from GithubUser.DMLib.DMDatabase import DMDatabase
 
 def read_china_conf ():
     special_file = ["location", "company", "login", "name", "email"]
@@ -64,7 +56,8 @@ def add_chinese(db, item):
     db["chinese"].insert(res)
 
 def main ():
-    db = init_db()
+    dm_db = DMDatabase()
+    db = dm_db.getDB()
     if (db):
         val = reg_china_condition()
         result = db["user"].find(val)

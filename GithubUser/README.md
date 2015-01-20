@@ -2,6 +2,9 @@
 
 ## based on github openAPI, basic authentication
 
+# DMLib
+- Data mining lib
+
 # git_data_prepare
 - A couple of tools to get data from github and insert into our database. (mongodb in my case)
 

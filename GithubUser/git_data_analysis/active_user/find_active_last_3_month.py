@@ -2,18 +2,10 @@ import base64
 import json
 import re
 import sys
+sys.path.append("../../..")
 from os import walk
 import pymongo
 from pymongo import MongoClient
-
-def init_db ():
-    _db_addr = "127.0.0.1"
-    _db_port = 27017
-    _db_name = "github"
-
-    client = MongoClient(_db_addr, _db_port)
-    db = client[_db_name]
-    return db
 
 def active_user(db):
     active_date_strs = ["^2014-10", "^2014-11", "^2014-12", "^2015-01"]
@@ -30,7 +22,8 @@ def active_user(db):
   
 
 def main ():
-    db = init_db()
+    dm_db = DMDatabase()
+    db = dm_db.getDB()
     if (db):
         val = active_user(db)
         count = db["user"].find(val).count()

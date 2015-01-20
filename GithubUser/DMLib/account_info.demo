@@ -1,0 +1,4 @@
+[
+    {"login":"fakelogin1", "password": "fakepass1"},
+    {"login":"fakelogin2", "password": "fakepass2"}
+]

@@ -31,16 +31,8 @@
 
 # Find and save all the followers relationships
  - Command: 'python follower_tree.py'
- - Command: 'python follower_list_loop.py'
  - Using thread to download followers
  - Explain: follower_tree: start from one person and continue with all his/her followers like a tree
-            follower_list_loop: start from a list of people
 
-# Find and save all the repos of certain user
- - Command: 'python repo_list_loop.py'
- 
-# Find and save all the events of certain user
- - Command: 'python event_list_loop.py'
- 
 - - -
 Copyright 2014 Ospaf Lab Software, Inc. Unless otherwise marked, this work is licensed under a [Creative Commons Attribution 3.0 Unported License](http://creativecommons.org/licenses/by/3.0/).

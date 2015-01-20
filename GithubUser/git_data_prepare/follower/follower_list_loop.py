@@ -1,4 +1,6 @@
 import sys
+sys.path.append("../../..")
+
 import threading
 
 import base64
@@ -8,72 +10,18 @@ import urllib2
 import datetime
 import pymongo
 from pymongo import MongoClient
+from GithubUser.DMLib.DMDatabase import DMDatabase
+from GithubUser.DMLib.DMSharedUsers import DMSharedUsers
 
 user_thread = []
-
-user_pass = [
-    {"user":"githublover001", "password": "qwe123456", "count": 0},
-    {"user":"githublover002", "password": "qwe123456", "count": 0},
-    {"user":"githublover003", "password": "qwe123456", "count": 0},
-    {"user":"githublover004", "password": "qwe123456", "count": 0},
-    {"user":"githublover005", "password": "qwe123456", "count": 0},
-    {"user":"githublover006", "password": "qwe123456", "count": 0},
-    {"user":"githublover007", "password": "qwe123456", "count": 0},
-    {"user":"githublover008", "password": "qwe123456", "count": 0},
-    {"user":"githublover009", "password": "qwe123456", "count": 0},
-    {"user":"githublover010", "password": "qwe123456", "count": 0},
-    {"user":"githublover011", "password": "qwe123456", "count": 0},
-    {"user":"githublover012", "password": "qwe123456", "count": 0},
-    {"user":"githublover013", "password": "qwe123456", "count": 0},
-    {"user":"githublover014", "password": "qwe123456", "count": 0},
-    {"user":"githublover015", "password": "qwe123456", "count": 0},
-    {"user":"githublover016", "password": "qwe123456", "count": 0},
-    {"user":"githublover017", "password": "qwe123456", "count": 0},
-    {"user":"githublover018", "password": "qwe123456", "count": 0},
-    {"user":"githublover019", "password": "qwe123456", "count": 0},
-    {"user":"githublover020", "password": "qwe123456", "count": 0},
-    {"user":"githublover021", "password": "qwe123456", "count": 0},
-    {"user":"githublover022", "password": "qwe123456", "count": 0},
-    {"user":"githublover023", "password": "qwe123456", "count": 0},
-    {"user":"githublover024", "password": "qwe123456", "count": 0},
-    {"user":"githublover025", "password": "qwe123456", "count": 0},
-    {"user":"githublover026", "password": "qwe123456", "count": 0},
-    {"user":"githublover027", "password": "qwe123456", "count": 0},
-    {"user":"githublover028", "password": "qwe123456", "count": 0},
-    {"user":"githublover029", "password": "qwe123456", "count": 0},
-    {"user":"githublover030", "password": "qwe123456", "count": 0},
-    {"user":"githublover031", "password": "qwe123456", "count": 0},
-    {"user":"githublover032", "password": "qwe123456", "count": 0}
-]
-
-def init_db ():
-    _db_addr = "147.2.207.55"
-    _db_port = 27017
-    _db_name = "github"
-
-    client = MongoClient(_db_addr, _db_port)
-    db = client[_db_name]
-    return db
-
-def get_free_user():
-    min_count = 0
-    i = 0
-    for item in user_pass:
-        if (item["count"] < user_pass[min_count]["count"]):
-            min_count = i
-        i += 1
-    user_pass[min_count]["count"] += 1
-    return min_count
 
 # In github - follower, the default page_size is 30 and we cannot change it. 
 #    seems...Correct me if I were wrong
 def append_followers(gh_user_id, page):
     url = "https://api.github.com/users/"+gh_user_id+"/followers?page="+str(page);
     req = urllib2.Request(url)
-    i = get_free_user()
-    username = user_pass[i]["user"]
-    password = user_pass[i]["password"]
-    base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+    fu = DMSharedUsers().getFreeUser()
+    base64string = base64.encodestring('%s:%s' % (fu["login"], fu["password"])).replace('\n', '')
     req.add_header("Authorization", "Basic %s" % base64string)   
 
     res_data = urllib2.urlopen(req)
@@ -186,7 +134,7 @@ def run_task():
 
 
 def main():
-    db = init_db()
+    db = DMDatabase().getDB()
     if db:
         #githublover001
         total = 10293416
