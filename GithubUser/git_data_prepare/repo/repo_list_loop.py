@@ -89,11 +89,17 @@ def user_repos_list(db, user_login, count):
     return res
 
 class myThread (threading.Thread):
-    def __init__(self, db, start_id, end_id):
+    def __init__(self, db, task):
         threading.Thread.__init__(self)
+        saved_task = DMTask().getTask("github", task)
         self.db = db
-        self.start_id = start_id
-        self.end_id = end_id
+        if saved_task:
+            self.task = saved_task
+        else:
+            task["status"] = "init"
+            self.task = task
+            DMTask().addTask("github", self.task)
+
     def run(self):
         if self.task["status"] == "error":
             print "Task error, exiting the thread"
