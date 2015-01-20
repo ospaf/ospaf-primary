@@ -22,11 +22,11 @@ class DMTask:
 #       task = {"name": "get_followers", "action_type": "loop", "start": start_id, "end": end_id}
 #       action_type is used for the future ....
 # I prefer not to use _id
-        key_val = {"name": task["name"], "action_type": task["action_type"], "start": task["start"]}
+        key_val = {"name": task["name"], "action_type": task["action_type"], "start": task["start"], "end": task["end"]}
         return DMTask.__task_db__[col].find_one(key_val)
 
     def updateTask(self, col, task, val):
-        key_val = {"name": task["name"], "action_type": task["action_type"], "start": task["start"]}
+        key_val = {"name": task["name"], "action_type": task["action_type"], "start": task["start"], "end": task["end"]}
         set_val = {"$set": val}
         DMTask.__task_db__[col].update(key_val, set_val)
 

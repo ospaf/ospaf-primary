@@ -11,6 +11,7 @@ import pymongo
 from pymongo import MongoClient
 from GithubUser.DMLib.DMDatabase import DMDatabase
 from GithubUser.DMLib.DMSharedUsers import DMSharedUsers
+from GithubUser.DMLib.DMSharedUsers import DMSharedUsers
 
 user_thread = []
 
@@ -35,55 +36,45 @@ def append_repos(gh_user_id, page):
         ret_val.append (item)
     return ret_val
 
-def user_repos_count(db, user_login):
-    dc = db["user"]
-    result = dc.find_one({"login": user_login})
-    if (result):
-        return result["public_repos"]
-    else:
-        return -1
-
-    
-def upload_user_repos(db, user_login):
-    need_update = 0
+def upload_user_repos(db, user_login, user_count):
+    need_update = 1
 # old res is in our db
     old_res = db["repos"].find_one({"login": user_login})
     if old_res:
-        count = user_repos_count(db, user_login)
-        old_res_len = len(old_res["repos"])
-#since it is just init script used for research
-#we did the following judgement
-#in some of my cases, the user_id is not saved to our 'user' db
-#so the old_res_len is 0, in this case, we should update the 'follower' 
-        if (old_res_len > 0) and (count <= old_res_len): 
-            print "saved"
+        if old_res.has_key("count"):
+            old_res_len = old_res["count"]
+            if (old_res_len > 0) and (user_count <= old_res_len):
+                print "saved"
+                return
         else:
-# Check if we need to upload
-# TODO  better one
-            print "user count " + str(count) +"\t repo saved " + str(old_res_len)
-            need_update = 1
+            old_res_len = len(old_res["public_repos"])
+            if (old_res_len > 0) and (user_count <= old_res_len):
+                print "saved, but need to update - add count prop"
+                val = {"$set": {"count": old_res_len}}
+                db["repos"].update({"login":user_login}, val)
+                return
+    else:
+        need_update = 0
 
-# new res is updated by calling api
-# TODO chould be improved since the 'count' is already got
-# use the {} val is better
-
-    new_res = user_repos_list(db, user_login)
+    new_res = user_repos_list(db, user_login, user_count)
+    new_res_count = len(new_res)
     if need_update == 0:
         val = {"login": user_login, 
                "repos": new_res,
+               "count": new_res_count,
                "update_date": datetime.datetime.utcnow()
               }
         db["repos"].insert(val)
         print "insert " + user_login
     else:
         val = {"$set": {"update_date": datetime.datetime.utcnow(),
+                        "count": new_res_count,
                         "repos": new_res}}
         db["repos"].update({"login":user_login}, val)
         print "update " + user_login
 
-def user_repos_list(db, user_login):
+def user_repos_list(db, user_login, count):
     res = []
-    count = user_repos_count(db, user_login)
     if count <= 0:
         return res
 # 30 is github system defined
@@ -97,8 +88,6 @@ def user_repos_list(db, user_login):
 
     return res
 
-
-
 class myThread (threading.Thread):
     def __init__(self, db, start_id, end_id):
         threading.Thread.__init__(self)
@@ -106,15 +95,47 @@ class myThread (threading.Thread):
         self.start_id = start_id
         self.end_id = end_id
     def run(self):
-        print "Starting " + str(self.start_id)
-        i = self.start_id
-        while i < self.end_id:
-            dc = self.db["user"]
-            result = dc.find_one({"id": i})
-            if result:
-                upload_user_repos(self.db, result["login"])
+        if self.task["status"] == "error":
+            print "Task error, exiting the thread"
+            return
+        elif self.task["status"] == "finish":
+            print "Task already finish, exiting the thread"
+            return
+        else:
+            self.task["status"] = "running"
+            DMTask().updateTask("github", self.task, {"status": "running"})
+
+        start_id = self.task["start"]
+        end_id = self.task["end"]
+        if self.task.has_key("current"):
+            start_id = self.task["current"]
+            print "Find unfinished task, continue to work at " + str(start_id)
+
+        if end_id <= start_id:
+# This should be checked in DMTask
+            print "Error in the task"
+            return
+
+        query = {"$and": [{"id": {"$gte": start_id, "$lt": end_id}}, {"public_repos": {"$gt": 0}}]}
+
+        res = self.db["user"].find(query).sort("id", pymongo.ASCENDING)
+        res_len = res.count()
+        i = 0
+        percent_gap = res_len/100
+        for item in res:
+            r_count = item["public_repos"]
+            upload_user_repos(self.db, item["login"], r_count)
             i += 1
-        print "Exiting " + str(self.start_id)
+#save every 100 calculate 
+            if i%percent_gap == 0:
+                percent = 1.0 * i / res_len
+                DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent})
+
+        self.task["status"] = "finish"
+        DMTask().updateTask("github", self.task, {"status": "finish", "current": end_id, "percent": 1.0})
+        print "Task finish, exiting the thread"
+
+
 
 def run_task():
     for item in user_thread:
@@ -124,17 +145,14 @@ def run_task():
 def main():
     db = DMDatabase().getDB()
     if db:
-        #githublover001
-        total = 10293416
+        total = 10490000
+        gap_num = 10000
         thread_num = 64
-        gap = total/thread_num
         for i in range(0, thread_num):
-            start_id = i * gap
-            if i == (thread_num - 1):
-                end_id = total
-            else:
-                end_id = (i+1) * gap
-            new_thread = myThread(db, start_id, end_id)
+            start_id = i * gap_num
+            end_id = (i+1) * gap_num
+            task = {"name": "get_repos", "action_type": "loop", "start": start_id, "end": end_id}
+            new_thread = myThread(db, task)
             user_thread.append(new_thread)
         run_task()
 
