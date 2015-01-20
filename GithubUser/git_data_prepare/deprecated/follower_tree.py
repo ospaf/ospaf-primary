@@ -68,42 +68,11 @@ init_user = [
 ]
 
 user_pass = [
-    {"user":"githublover001", "password": "qwe123456", "count": 0},
-    {"user":"githublover002", "password": "qwe123456", "count": 0},
-    {"user":"githublover003", "password": "qwe123456", "count": 0},
-    {"user":"githublover004", "password": "qwe123456", "count": 0},
-    {"user":"githublover005", "password": "qwe123456", "count": 0},
-    {"user":"githublover006", "password": "qwe123456", "count": 0},
-    {"user":"githublover007", "password": "qwe123456", "count": 0},
-    {"user":"githublover008", "password": "qwe123456", "count": 0},
-    {"user":"githublover009", "password": "qwe123456", "count": 0},
-    {"user":"githublover010", "password": "qwe123456", "count": 0},
-    {"user":"githublover011", "password": "qwe123456", "count": 0},
-    {"user":"githublover012", "password": "qwe123456", "count": 0},
-    {"user":"githublover013", "password": "qwe123456", "count": 0},
-    {"user":"githublover014", "password": "qwe123456", "count": 0},
-    {"user":"githublover015", "password": "qwe123456", "count": 0},
-    {"user":"githublover016", "password": "qwe123456", "count": 0},
-    {"user":"githublover017", "password": "qwe123456", "count": 0},
-    {"user":"githublover018", "password": "qwe123456", "count": 0},
-    {"user":"githublover019", "password": "qwe123456", "count": 0},
-    {"user":"githublover020", "password": "qwe123456", "count": 0},
-    {"user":"githublover021", "password": "qwe123456", "count": 0},
-    {"user":"githublover022", "password": "qwe123456", "count": 0},
-    {"user":"githublover023", "password": "qwe123456", "count": 0},
-    {"user":"githublover024", "password": "qwe123456", "count": 0},
-    {"user":"githublover025", "password": "qwe123456", "count": 0},
-    {"user":"githublover026", "password": "qwe123456", "count": 0},
-    {"user":"githublover027", "password": "qwe123456", "count": 0},
-    {"user":"githublover028", "password": "qwe123456", "count": 0},
-    {"user":"githublover029", "password": "qwe123456", "count": 0},
-    {"user":"githublover030", "password": "qwe123456", "count": 0},
-    {"user":"githublover031", "password": "qwe123456", "count": 0},
-    {"user":"githublover032", "password": "qwe123456", "count": 0}
+    {"user":"fake", "password": "fake", "count": 0}
 ]
 
 def init_db ():
-    _db_addr = "147.2.207.55"
+    _db_addr = "127.0.0.1"
     _db_port = 27017
     _db_name = "github"
 

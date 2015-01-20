@@ -11,10 +11,7 @@ import urllib
 import urllib2
 
 user_pass = [
-    {"user":"githublover023", "password": "qwe123456", "count": 0},
-    {"user":"githublover004", "password": "qwe123456", "count": 0},
-    {"user":"githublover001", "password": "qwe123456", "count": 0},
-    {"user":"githublover002", "password": "qwe123456", "count": 0}
+    {"user":"fake", "password": "fake", "count": 0}
 ]
 
 def send_request(gh_user_id, i):
