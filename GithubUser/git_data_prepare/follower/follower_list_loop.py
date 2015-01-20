@@ -131,7 +131,7 @@ class myThread (threading.Thread):
         dc = self.db["user"]
         res = dc.find(query).sort("id", pymongo.ASCENDING)
         i = 0
-        res_len = len(res)
+        res_len = res.count()
         for item in res:
             f_count = item["followers"]
             upload_user_followers(self.db, res["login"], f_count)
