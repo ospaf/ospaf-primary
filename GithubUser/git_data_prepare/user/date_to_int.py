@@ -21,18 +21,26 @@ def date_string_to_int(date_string):
 #This is used to make 'date' related operation faster
 def fix_event():
     db = DMDatabase().getDB()
-    res = db["user"].find()
-    i = 0
-    for item in res:
-        created_at_string = item["created_at"]
-        updated_at_string = item["updated_at"]
-        created_at_int = date_string_to_int(created_at_string)
-        updated_at_int = date_string_to_int(updated_at_string)
 
-        db["user"].update({"login": item["login"]}, {"$set": {"created_at_int": created_at_int, "updated_at_int": updated_at_int}})
+    total = 1050
+    gap_num = 10000
+    i = 0
+    while i<total:
+        min = i * gap_num
+        max = (i+1) * gap_num
+        query = {"id": {"$gte": min, "$lt": max}}
+
+        res = db["user"].find(query)
+        for item in res:
+            if item.has_key("created_at_int"):
+                continue
+            created_at_string = item["created_at"]
+            updated_at_string = item["updated_at"]
+            created_at_int = date_string_to_int(created_at_string)
+            updated_at_int = date_string_to_int(updated_at_string)
+            db["user"].update({"login": item["login"]}, {"$set": {"created_at_int": created_at_int, "updated_at_int": updated_at_int}})
         i += 1
-        if i%10000 == 0:
-            print i
+        print i
     print "Finish"
 
 fix_event()
