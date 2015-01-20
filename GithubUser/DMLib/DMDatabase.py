@@ -7,6 +7,7 @@ from pymongo import MongoClient
 
 #TODO try catch...
 class DMDatabase:
+    __dm_client__ = None
     __dm_database__ = None
     def __init__(self):
         if DMDatabase.__dm_database__ is not None:
@@ -16,8 +17,11 @@ class DMDatabase:
         fo.close()
         val = json.loads(db_str)
 
-        client = MongoClient(val["addr"], val["port"])
-        DMDatabase.__dm_database__ = client[val["db_name"]]
+        DMDatabase.__dm_client__ = MongoClient(val["addr"], val["port"])
+        DMDatabase.__dm_database__ = DMDatabase.__dm_client__[val["db_name"]]
+
+    def getClient(self):
+        return DMDatabase.__dm_client__
 
     def getDB(self):
         return DMDatabase.__dm_database__

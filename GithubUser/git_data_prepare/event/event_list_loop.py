@@ -76,7 +76,11 @@ def user_event_list(db, user_login):
         ret_val = append_event(user_login, i)
 #FIXME: what if we received page1 and get error in page2
         if (ret_val["error"] == 1):
-            return {"error":1}
+#FIXME: not very good
+            if i > 1:
+                break
+            else:
+                return {"error":1}
         elif len(ret_val["val"]) == 0:
             break
         res += ret_val["val"]
@@ -137,7 +141,7 @@ def main():
         print gap
 
         for i in range(0, thread_num):
-            start_id = i * gap + 60000
+            start_id = i * gap + 100000
             if i == (thread_num - 1):
                 end_id = total
             else:

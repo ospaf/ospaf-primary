@@ -11,6 +11,7 @@ import datetime
 import pymongo
 from pymongo import MongoClient
 from GithubUser.DMLib.DMDatabase import DMDatabase
+from GithubUser.DMLib.DMTask import DMTask
 from GithubUser.DMLib.DMSharedUsers import DMSharedUsers
 
 user_thread = []
@@ -42,56 +43,46 @@ def user_followers_count(db, user_login):
         return -1
 
     
-def upload_user_followers(db, user_login):
-    need_update = 0
+def upload_user_followers(db, user_login, count):
+    need_update = 1
 # old res is in our db
     old_res = db["followers"].find_one({"login": user_login})
     if old_res:
-        count = user_followers_count(db, user_login)
-        old_res_len = len(old_res["followers"])
-#since it is just init script used for research
-#we did the following judgement
-#in some of my cases, the user_id is not saved to our 'user' db
-#so the old_res_len is 0, in this case, we should update the 'follower' 
-        if (old_res_len > 0) and (count <= old_res_len): 
-            print "saved"
-#if saved, we could/update all his/her followers
-#In the future, we will not upload in this case
-#for now, we open it to get more followers info
-            in_long_run = 0
-            if in_long_run:
-                for item in old_res["followers"]:
-                    upload_user_followers(db, item["login"])
-            return
+        if old_res.has_key("count"):
+            old_res_len = old_res["count"]
+            if (old_res_len > 0) and (count <= old_res_len): 
+                print "saved"
+                return
         else:
-# Check if we need to upload
-# TODO  better one
-            print "user count " + str(count) +"\t follower saved " + str(old_res_len)
-            need_update = 1
+            old_res_len = len(old_res["followers"])
+            if (old_res_len > 0) and (count <= old_res_len): 
+                print "saved, but need to update - add count prop"
+                val = {"$set": {"count": old_res_len}}
+                db["followers"].update({"login":user_login}, val)
+                return
+    else:
+        need_update = 0
 
 # new res is updated by calling api
-# TODO chould be improved since the 'count' is already got
+# TODO could be improved since the 'count' is already got
 # use the {} val is better
 
     new_res = user_followers_list(db, user_login)
+    new_res_count = len(new_res)
     if need_update == 0:
         val = {"login": user_login, 
                "followers": new_res,
+               "count": new_res_count,
                "update_date": datetime.datetime.utcnow()
               }
         db["followers"].insert(val)
         print "insert " + user_login
     else:
         val = {"$set": {"update_date": datetime.datetime.utcnow(),
+                        "count": new_res_count,
                         "followers": new_res}}
         db["followers"].update({"login":user_login}, val)
         print "update " + user_login
-
-    in_long_run = 0
-    if in_long_run:
-        for item in new_res:
-            upload_user_followers(db, item["login"])
-        
 
 def user_followers_list(db, user_login):
     res = []
@@ -109,24 +100,48 @@ def user_followers_list(db, user_login):
 
     return res
 
-
-
 class myThread (threading.Thread):
-    def __init__(self, db, start_id, end_id):
+    def __init__(self, db, task):
         threading.Thread.__init__(self)
+        saved_task = DMTask().getTask("github", task)
         self.db = db
-        self.start_id = start_id
-        self.end_id = end_id
+        if saved_task:
+            self.task = saved_task
+        else:
+            task["status"] = "init"
+            self.task = task
+            DMTask().addTask("github", self.task)
+
     def run(self):
-        print "Starting " + str(self.start_id)
-        i = self.start_id
-        while i < self.end_id:
-            dc = self.db["user"]
-            result = dc.find_one({"id": i})
-            if result:
-                upload_user_followers(self.db, result["login"])
+        if self.task["status"] == "finish":
+            print "Task already finish, exiting the thread"
+            return
+        else:
+            self.task["status"] = "running"
+            DMTask().updateTask("github", self.task, {"status": "running"})
+
+        start_id = self.task["start"]
+        end_id = self.task["end"]
+        if self.task.has_key("current"):
+            start_id = self.task["current"]
+            print "Find unfinished task, continue to work at " + str(start_id)
+
+        query = {"$and": [{"id": {"$gte": start_id, "$lt": end_id}}, {"followers": {"$gt": 0}}]}
+        
+        dc = self.db["user"]
+        res = dc.find(query).sort("id", pymongo.ASCENDING)
+        i = 0
+        for item in res:
+            f_count = item["followers"]
+            upload_user_followers(self.db, res["login"], f_count)
             i += 1
-        print "Exiting " + str(self.start_id)
+#save every 100 calculate 
+            if i%100 == 0:
+                DMTask().updateTask("github", self.task, {"current": res["id"]})
+
+        self.task["status"] = "finish"
+        DMTask().updateTask("github", self.task, {"status": "finish"})
+        print "Task finish, exiting the thread"
 
 def run_task():
     for item in user_thread:
@@ -136,17 +151,14 @@ def run_task():
 def main():
     db = DMDatabase().getDB()
     if db:
-        #githublover001
-        total = 10293416
+        total = 10490000
+        gap_num = 10000
         thread_num = 64
-        gap = total/thread_num
         for i in range(0, thread_num):
-            start_id = i * gap
-            if i == (thread_num - 1):
-                end_id = total
-            else:
-                end_id = (i+1) * gap
-            new_thread = myThread(db, start_id, end_id)
+            start_id = i * gap_num
+            end_id = (i+1) * gap_num
+            task = {"name": "get_followers", "action_type": "loop", "start": start_id, "end": end_id}
+            new_thread = myThread(db, task)
             user_thread.append(new_thread)
         run_task()
 
