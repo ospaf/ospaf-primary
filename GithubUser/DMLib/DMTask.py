@@ -41,5 +41,7 @@ class DMTask:
 #TODO connect with server will be better
     def taskStatus(self, col):
         print "AccountInfo: "
-        print DMTask.__task_db__[col].find()
+        res = DMTask.__task_db__[col].find()
+        for item in res:
+            print item
 

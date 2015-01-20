@@ -14,5 +14,8 @@
 - for client to continue working on a task
 - TODO deliver task one day
 
+# Test
+- test_task.py - test task
+
 - - -
 Copyright 2014 Ospaf Lab Software, Inc. Unless otherwise marked, this work is licensed under a [Creative Commons Attribution 3.0 Unported License](http://creativecommons.org/licenses/by/3.0/).
