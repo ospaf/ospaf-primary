@@ -2,8 +2,8 @@
 
 ## based on github openAPI, basic authentication
 
-# find monthly amount
- - Command: 'python monthly_amount.py'
+# find monthly amount & monthly amount and both active
+ - Command: 'python monthly_amount.py'  'python monthly_amount_still_active.py'
  - Explain: get the total amount of each month
 
 # generate monthly report
