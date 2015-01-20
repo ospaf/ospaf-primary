@@ -131,13 +131,19 @@ class myThread (threading.Thread):
         dc = self.db["user"]
         res = dc.find(query).sort("id", pymongo.ASCENDING)
         i = 0
+        res_len = len(res)
         for item in res:
             f_count = item["followers"]
             upload_user_followers(self.db, res["login"], f_count)
             i += 1
 #save every 100 calculate 
             if i%100 == 0:
-                DMTask().updateTask("github", self.task, {"current": res["id"]})
+                if end_id <= start_id:
+# This should be checked in DMTask
+                    print "Error in the task"
+                    return
+                percent = 1.0 * i / res_len
+                DMTask().updateTask("github", self.task, {"current": res["id"], "percent": percent})
 
         self.task["status"] = "finish"
         DMTask().updateTask("github", self.task, {"status": "finish"})
