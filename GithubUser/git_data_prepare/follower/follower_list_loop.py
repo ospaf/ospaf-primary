@@ -34,28 +34,19 @@ def append_followers(gh_user_id, page):
         ret_val.append ({"id": item["id"], "login": item["login"]})
     return ret_val
 
-def user_followers_count(db, user_login):
-    dc = db["user"]
-    result = dc.find_one({"login": user_login})
-    if (result):
-        return result["followers"]
-    else:
-        return -1
-
-    
-def upload_user_followers(db, user_login, count):
+def upload_user_followers(db, user_login, user_count):
     need_update = 1
 # old res is in our db
     old_res = db["followers"].find_one({"login": user_login})
     if old_res:
         if old_res.has_key("count"):
             old_res_len = old_res["count"]
-            if (old_res_len > 0) and (count <= old_res_len): 
+            if (old_res_len > 0) and (user_count <= old_res_len): 
                 print "saved"
                 return
         else:
             old_res_len = len(old_res["followers"])
-            if (old_res_len > 0) and (count <= old_res_len): 
+            if (old_res_len > 0) and (user_count <= old_res_len): 
                 print "saved, but need to update - add count prop"
                 val = {"$set": {"count": old_res_len}}
                 db["followers"].update({"login":user_login}, val)
@@ -67,7 +58,7 @@ def upload_user_followers(db, user_login, count):
 # TODO could be improved since the 'count' is already got
 # use the {} val is better
 
-    new_res = user_followers_list(db, user_login)
+    new_res = user_followers_list(db, user_login, user_count)
     new_res_count = len(new_res)
     if need_update == 0:
         val = {"login": user_login, 
@@ -84,9 +75,8 @@ def upload_user_followers(db, user_login, count):
         db["followers"].update({"login":user_login}, val)
         print "update " + user_login
 
-def user_followers_list(db, user_login):
+def user_followers_list(db, user_login, count):
     res = []
-    count = user_followers_count(db, user_login)
     if count <= 0:
         return res
 # 30 is github system defined
@@ -126,27 +116,28 @@ class myThread (threading.Thread):
             start_id = self.task["current"]
             print "Find unfinished task, continue to work at " + str(start_id)
 
+        if end_id <= start_id:
+# This should be checked in DMTask
+            print "Error in the task"
+            return
+
         query = {"$and": [{"id": {"$gte": start_id, "$lt": end_id}}, {"followers": {"$gt": 0}}]}
         
-        dc = self.db["user"]
-        res = dc.find(query).sort("id", pymongo.ASCENDING)
-        i = 0
+        res = self.db["user"].find(query).sort("id", pymongo.ASCENDING)
         res_len = res.count()
+        i = 0
+        percent_gap = res_len/100
         for item in res:
             f_count = item["followers"]
-            upload_user_followers(self.db, res["login"], f_count)
+            upload_user_followers(self.db, item["login"], f_count)
             i += 1
 #save every 100 calculate 
-            if i%100 == 0:
-                if end_id <= start_id:
-# This should be checked in DMTask
-                    print "Error in the task"
-                    return
+            if i%percent_gap == 0:
                 percent = 1.0 * i / res_len
-                DMTask().updateTask("github", self.task, {"current": res["id"], "percent": percent})
+                DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent})
 
         self.task["status"] = "finish"
-        DMTask().updateTask("github", self.task, {"status": "finish"})
+        DMTask().updateTask("github", self.task, {"status": "finish", "current": end_id, "percent": 1.0})
         print "Task finish, exiting the thread"
 
 def run_task():

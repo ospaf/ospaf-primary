@@ -25,18 +25,21 @@ class DMTask:
         key_val = {"name": task["name"], "action_type": task["action_type"], "start": task["start"]}
         return DMTask.__task_db__[col].find_one(key_val)
 
-    def updateTask(self, col, task):
+    def updateTask(self, col, task, val):
         key_val = {"name": task["name"], "action_type": task["action_type"], "start": task["start"]}
-        val = {"$set": task}
-        DMTask.__task_db__[col].update(key_val, val)
+        set_val = {"$set": val}
+        DMTask.__task_db__[col].update(key_val, set_val)
 
     def addTask (self, col, task):
-        if getTask(self, col, task):
+        if DMTask.getTask(self, col, task):
 # TODO
             print "The task has already exist, TODO, how to work this situation?"
             return
         else:
             DMTask.__task_db__[col].insert(task)
+
+    def dropTasks (self, col):
+         DMTask.__task_db__[col].drop()
 
 #TODO connect with server will be better
     def taskStatus(self, col):
