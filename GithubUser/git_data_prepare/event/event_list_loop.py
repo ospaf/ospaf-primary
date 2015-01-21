@@ -19,14 +19,11 @@ user_thread = []
 
 # In github - event, the default page_size is 30 and we cannot change it. 
 #    seems...Correct me if I were wrong
+# different with pub_repos or followers, we need to track the error!
 def append_event(gh_user_id, page):
     url = "https://api.github.com/users/"+gh_user_id+"/events?page="+str(page);
-
-    res = DMSharedUsers().readURL(url)
-    if res["error"] == 0:
-        return res["val"]
-    else:
-        return []
+  
+    return DMSharedUsers().readURL(url)
 
 def upload_user_event(db, user_login):
     need_update = 0
@@ -39,6 +36,7 @@ def upload_user_event(db, user_login):
     new_res = user_event_list(db, user_login)
     if (new_res["error"] == 1):
         return
+
     count = len(new_res["val"])
 
     if count > 0:
@@ -53,13 +51,13 @@ def user_event_list(db, user_login):
 #    print "User event " + user_login + " begin"
     while 1:
         ret_val = append_event(user_login, i)
-        if len(ret_val) == 0:
-            break
-        res += ret_val
+        if ret_val["error"] == 1:
+            return {"error": 1}
+        res += ret_val["val"]
         i += 1
 
 #    print "User event " + user_login + " end"
-    return res
+    return {"error": 0, "val": res}
 
 def active_date(date):
 # github just save the last three month, or we say, last 90 days.
@@ -80,23 +78,61 @@ def active_date(date):
 
 
 class myThread (threading.Thread):
-    def __init__(self, db, start_id, end_id):
+    def __init__(self, db, task):
         threading.Thread.__init__(self)
+        saved_task = DMTask().getTask("github", task)
         self.db = db
-        self.start_id = start_id
-        self.end_id = end_id
+        if saved_task:
+            self.task = saved_task
+        else:
+            task["status"] = "init"
+            self.task = task
+            DMTask().addTask("github", self.task)
+
     def run(self):
-        print "Starting " + str(self.start_id)
-        i = self.start_id
-        while i < self.end_id:
-            dc = self.db["user"]
-            result = dc.find_one({"id": i})
-            if result:
-                updated_date = result["updated_at"]
-                if active_date(updated_date):
-                    upload_user_event(self.db, result["login"])
+        if self.task["status"] == "error":
+            print "Task error, exiting the thread"
+            return
+        elif self.task["status"] == "finish":
+            print "Task already finish, exiting the thread"
+            return
+        else:
+            self.task["status"] = "running"
+            DMTask().updateTask("github", self.task, {"status": "running"})
+
+        start_id = self.task["start"]
+        end_id = self.task["end"]
+        if self.task.has_key("current"):
+            start_id = self.task["current"]
+            print "Find unfinished task, continue to work at " + str(start_id)
+
+        if end_id <= start_id:
+# This should be checked in DMTask
+            print "Error in the task"
+            return
+
+        query = {"id": {"$gte": start_id, "$lt": end_id}}
+
+        res = self.db["user"].find(query).sort("id", pymongo.ASCENDING)
+        res_len = res.count()
+        i = 0
+        percent_gap = res_len/100
+        for item in res:
+            updated_date = result["updated_at"]
             i += 1
-        print "Exiting " + str(self.start_id)
+            if active_date(updated_date):
+                upload_user_event(self.db, result["login"])
+            if percent_gap == 0:
+                percent = 1.0 * i / res_len
+                DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent})
+#save every 100 calculate 
+            elif i%percent_gap == 0:
+                percent = 1.0 * i / res_len
+                DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent})
+
+        self.task["status"] = "finish"
+        DMTask().updateTask("github", self.task, {"status": "finish", "current": end_id, "percent": 1.0})
+        print "Task finish, exiting the thread"
 
 def run_task():
     for item in user_thread:
@@ -106,19 +142,14 @@ def run_task():
 def main():
     db = DMDatabase().getDB()
     if db:
-        #githublover001
-        total = 10293416
+        total = 10490000
+        gap_num = 10000
         thread_num = 64
-        gap = total/thread_num
-        print gap
-
         for i in range(0, thread_num):
-            start_id = i * gap + 100000
-            if i == (thread_num - 1):
-                end_id = total
-            else:
-                end_id = (i+1) * gap
-            new_thread = myThread(db, start_id, end_id)
+            start_id = i * gap_num
+            end_id = (i+1) * gap_num
+            task = {"name": "get_events", "action_type": "loop", "start": start_id, "end": end_id}
+            new_thread = myThread(db, task)
             user_thread.append(new_thread)
         run_task()
 
