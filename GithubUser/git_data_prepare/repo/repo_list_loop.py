@@ -98,7 +98,7 @@ class myThread (threading.Thread):
             return
         else:
             self.task["status"] = "running"
-            DMTask().updateTask("github", self.task, {"status": "running"})
+            DMTask().updateTask("github", self.task, {"status": "running", "update_date": datetime.datetime.utcnow()})
 
         start_id = self.task["start"]
         end_id = self.task["end"]
@@ -123,14 +123,14 @@ class myThread (threading.Thread):
             i += 1
             if percent_gap == 0:
                 percent = 1.0 * i / res_len
-                DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent})
+                DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent, "update_date": datetime.datetime.utcnow()})
 #save every 100 calculate 
             elif i%percent_gap == 0:
                 percent = 1.0 * i / res_len
-                DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent})
+                DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent, "update_date": datetime.datetime.utcnow()})
 
         self.task["status"] = "finish"
-        DMTask().updateTask("github", self.task, {"status": "finish", "current": end_id, "percent": 1.0})
+        DMTask().updateTask("github", self.task, {"status": "finish", "current": end_id, "percent": 1.0, "update_date": datetime.datetime.utcnow()})
         print "Task finish, exiting the thread"
 
 
@@ -149,7 +149,7 @@ def main():
         for i in range(0, thread_num):
             start_id = i * gap_num
             end_id = (i+1) * gap_num
-            task = {"name": "get_repos", "action_type": "loop", "start": start_id, "end": end_id}
+            task = {"name": "get_repos", "action_type": "loop", "start": start_id, "end": end_id, "gap": gap_num}
             new_thread = myThread(db, task)
             user_thread.append(new_thread)
         run_task()

@@ -71,7 +71,9 @@ def updated_date_count(date):
     return res
 
 def id_count(min, max):
-    res = {"id": {"$gte": min, "$lt": max}}
+#    res = {"id": {"$gte": min, "$lt": max}}
+# TODO dliang borrow
+    res = {"created_at_int": {"$gte": min, "$lt": max}}
     return res
 
 def command_process (dc, argv):

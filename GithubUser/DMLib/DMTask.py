@@ -9,6 +9,8 @@ from pymongo import MongoClient
 from DMDatabase import DMDatabase
 
 #TODO try catch...
+#TODO client could stop the task once it cannot continue and other could do the task for the original client
+#       use ping to show the client is alive? or we add a timeout to each task record?
 
 class DMTask:
     __task_db__ = None
