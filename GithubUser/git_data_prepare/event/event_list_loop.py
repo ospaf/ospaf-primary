@@ -118,10 +118,10 @@ class myThread (threading.Thread):
         i = 0
         percent_gap = res_len/100
         for item in res:
-            updated_date = result["updated_at"]
+            updated_date = item["updated_at"]
             i += 1
             if active_date(updated_date):
-                upload_user_event(self.db, result["login"])
+                upload_user_event(self.db, item["login"])
             if percent_gap == 0:
                 percent = 1.0 * i / res_len
                 DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent})
@@ -144,7 +144,7 @@ def main():
     if db:
         total = 10490000
         gap_num = 10000
-        thread_num = 64
+        thread_num = 128
         for i in range(0, thread_num):
             start_id = i * gap_num
             end_id = (i+1) * gap_num
