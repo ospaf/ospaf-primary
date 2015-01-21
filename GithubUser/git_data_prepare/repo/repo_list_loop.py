@@ -20,11 +20,10 @@ user_thread = []
 def append_repos(gh_user_id, page):
     url = "https://api.github.com/users/"+gh_user_id+"/repos?page="+str(page);
     res = DMSharedUsers.readURL(url)
-    ret_val = []
     if res["error"] == 0:
-        for item in res["val"]:
-            ret_val.append (item)
-    return ret_val
+        return res["val"]
+    else:
+        return []
 
 def upload_user_repos(db, user_login, user_count):
     need_update = 1

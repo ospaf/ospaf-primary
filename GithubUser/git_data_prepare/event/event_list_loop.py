@@ -13,41 +13,20 @@ import pymongo
 from pymongo import MongoClient
 from GithubUser.DMLib.DMDatabase import DMDatabase
 from GithubUser.DMLib.DMSharedUsers import DMSharedUsers
+from GithubUser.DMLib.DMTask import DMTask
 
 user_thread = []
 
-# In github - follower, the default page_size is 30 and we cannot change it. 
+# In github - event, the default page_size is 30 and we cannot change it. 
 #    seems...Correct me if I were wrong
 def append_event(gh_user_id, page):
     url = "https://api.github.com/users/"+gh_user_id+"/events?page="+str(page);
-#    print url
-    req = urllib2.Request(url)
-    fu = DMSharedUsers().getFreeUser()
-    base64string = base64.encodestring('%s:%s' % (fu["login"], fu["password"])).replace('\n', '')
-    req.add_header("Authorization", "Basic %s" % base64string)   
 
-    try:
-        res_data = urllib2.urlopen(req)
-    except urllib2.URLError, err:
-# TODO we should note this ...
-        print 'dliang url error' + url
-        print err
-        return {"error": 1}
-    except urllib2.HTTPError, err:
-        print '404 error'
-        if err.code == 404:
-             return {"error": 1}
-    except httplib.HTTPException, err:
-        print 'http exception'
-        return {"error": 1}
-# TODO timeout
+    res = DMSharedUsers.readURL(url)
+    if res["error"] == 0:
+        return res["val"]
     else:
-        res = res_data.read()
-        val = json.loads(res)
-        return {"error": 0, "val": val}
-
-    print "How to get here?"
-    return {"error": 1}
+        return []
 
 def upload_user_event(db, user_login):
     need_update = 0
@@ -74,20 +53,13 @@ def user_event_list(db, user_login):
 #    print "User event " + user_login + " begin"
     while 1:
         ret_val = append_event(user_login, i)
-#FIXME: what if we received page1 and get error in page2
-        if (ret_val["error"] == 1):
-#FIXME: not very good
-            if i > 1:
-                break
-            else:
-                return {"error":1}
-        elif len(ret_val["val"]) == 0:
+        if len(ret_val) == 0:
             break
-        res += ret_val["val"]
+        res += ret_val
         i += 1
 
 #    print "User event " + user_login + " end"
-    return {"error": 0, "val": res}
+    return res
 
 def active_date(date):
 # github just save the last three month, or we say, last 90 days.
