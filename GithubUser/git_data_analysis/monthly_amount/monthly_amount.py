@@ -86,12 +86,9 @@ def main_string ():
         print "Cannot connect to database"
 
 def find_by_month_int (db, month_int_start):
-# FIXME: regex seems very very slow
-    print "start to find " + month_int_start
-    month_in_end = month_int_start + 100
+    print "start to find " + str(month_int_start)
+    month_int_end = month_int_start + 100
     query_created = {"created_at_int": {"$gte": month_int_start, "$lt": month_int_end}}
-#    query_updated = {"updated_at_in": {"$gt": 20141000}}
-#    query_json = {"$and": [query_created, query_updated]}
     res = db["user"].find(query_created)
     res_len = res.count()
     answer = {"type": "monthly_amount", 
@@ -104,26 +101,21 @@ def find_by_month_int (db, month_int_start):
         res_last = res[res_len-1]
         answer["first"] = {"id": res_first["id"], "login": res_first["login"]}
         answer["last"] = {"id": res_last["id"], "login": res_last["login"]}
-    print "\n----------------------\nMonth " + month_int_start/100
+    print "\n----------------------\nMonth " + str(month_int_start/100)
     print answer
     print   "----------------------\n"
 
     need_update = 0
     saved_res = db["research_result"].find_one({"type": "monthly_amount", "month": month_int_start/100})
     if saved_res:
-# most time it is right. only if github close/private lots of previous account in a short time
-        if saved_res["total_public"] < res_len:
-            need_update = 1
-        else:
-            print "The " + month_int_start_/100 + " result is saved already"
-            return
+        need_update = 1
 
     if need_update:
         db["research_result"].update({"type":"monthly_amount", "month": month_int_start/100}, {"$set": answer})
-        print "The " + month_int_start/100 + " result is updated"
+        print "The " + str(month_int_start/100) + " result is updated"
     else:
         db["research_result"].insert(answer)
-        print "The " + month_int_start + " result is added"
+        print "The " + str(month_int_start/100) + " result is added"
 
     return
 
