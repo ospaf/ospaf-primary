@@ -52,9 +52,17 @@ def user_event_list(db, user_login):
     while 1:
         ret_val = append_event(user_login, i)
         if ret_val["error"] == 1:
-            return {"error": 1}
+            if i > 2:
+#   "message": "In order to keep the API fast for everyone, pagination is limited for this resource. Check the rel=last link relation in the Link response header to see how far back you can traverse.",
+#  "documentation_url": "https://developer.github.com/v3/#pagination"
+                return {"error": 0, "val": res}
+            else:
+                return {"error": 1}
         res += ret_val["val"]
         i += 1
+# simply return if event > 10..
+        if i > 10:
+            break
 
 #    print "User event " + user_login + " end"
     return {"error": 0, "val": res}

@@ -3,6 +3,7 @@ import os
 import base64
 import json
 import json
+import httplib
 import urllib
 import urllib2
 import datetime
