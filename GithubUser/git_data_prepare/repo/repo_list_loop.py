@@ -19,7 +19,7 @@ user_thread = []
 #    seems...Correct me if I were wrong
 def append_repos(gh_user_id, page):
     url = "https://api.github.com/users/"+gh_user_id+"/repos?page="+str(page);
-    res = DMSharedUsers.readURL(url)
+    res = DMSharedUsers().readURL(url)
     if res["error"] == 0:
         return res["val"]
     else:
@@ -36,7 +36,7 @@ def upload_user_repos(db, user_login, user_count):
                 print "saved"
                 return
         else:
-            old_res_len = len(old_res["public_repos"])
+            old_res_len = len(old_res["repos"])
             if (old_res_len > 0) and (user_count <= old_res_len):
                 print "saved, but need to update - add count prop"
                 val = {"$set": {"count": old_res_len}}
@@ -121,8 +121,11 @@ class myThread (threading.Thread):
             r_count = item["public_repos"]
             upload_user_repos(self.db, item["login"], r_count)
             i += 1
+            if percent_gap == 0:
+                percent = 1.0 * i / res_len
+                DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent})
 #save every 100 calculate 
-            if i%percent_gap == 0:
+            elif i%percent_gap == 0:
                 percent = 1.0 * i / res_len
                 DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent})
 

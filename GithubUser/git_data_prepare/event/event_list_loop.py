@@ -22,7 +22,7 @@ user_thread = []
 def append_event(gh_user_id, page):
     url = "https://api.github.com/users/"+gh_user_id+"/events?page="+str(page);
 
-    res = DMSharedUsers.readURL(url)
+    res = DMSharedUsers().readURL(url)
     if res["error"] == 0:
         return res["val"]
     else:

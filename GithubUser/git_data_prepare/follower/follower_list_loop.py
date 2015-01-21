@@ -20,7 +20,7 @@ user_thread = []
 #    seems...Correct me if I were wrong
 def append_followers(gh_user_id, page):
     url = "https://api.github.com/users/"+gh_user_id+"/followers?page="+str(page);
-    res = DMSharedUsers.readURL(url)
+    res = DMSharedUsers().readURL(url)
     ret_val = []
     if res["error"] == 0:
         for item in res["val"]:
@@ -127,8 +127,11 @@ class myThread (threading.Thread):
             f_count = item["followers"]
             upload_user_followers(self.db, item["login"], f_count)
             i += 1
+            if percent_gap == 0:
+                percent = 1.0 * i / res_len
+                DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent})
 #save every 100 calculate 
-            if i%percent_gap == 0:
+            elif i%percent_gap == 0:
                 percent = 1.0 * i / res_len
                 DMTask().updateTask("github", self.task, {"current": item["id"], "percent": percent})
 
