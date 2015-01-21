@@ -11,7 +11,7 @@ import pymongo
 from pymongo import MongoClient
 from GithubUser.DMLib.DMDatabase import DMDatabase
 from GithubUser.DMLib.DMSharedUsers import DMSharedUsers
-from GithubUser.DMLib.DMSharedUsers import DMSharedUsers
+from GithubUser.DMLib.DMTask import DMTask
 
 user_thread = []
 
@@ -19,21 +19,11 @@ user_thread = []
 #    seems...Correct me if I were wrong
 def append_repos(gh_user_id, page):
     url = "https://api.github.com/users/"+gh_user_id+"/repos?page="+str(page);
-
-    req = urllib2.Request(url)
-    fu = DMSharedUsers().getFreeUser()
-    base64string = base64.encodestring('%s:%s' % (fu["login"], fu["password"])).replace('\n', '')
-    req.add_header("Authorization", "Basic %s" % base64string)   
-
-    res_data = urllib2.urlopen(req)
-    res = res_data.read()
-
-    val = json.loads(res)
+    res = DMSharedUsers.readURL(url)
     ret_val = []
-    for item in val:
-# We save all the content ... 
-# TODO some info is useless actually...
-        ret_val.append (item)
+    if res["error"] == 0:
+        for item in res["val"]:
+            ret_val.append (item)
     return ret_val
 
 def upload_user_repos(db, user_login, user_count):

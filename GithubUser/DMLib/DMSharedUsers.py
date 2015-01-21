@@ -46,3 +46,32 @@ class DMSharedUsers:
         print "AccountInfo: "
         print DMSharedUsers.__shared_users__
 
+    def readURL(self, url):
+        req = urllib2.Request(url)
+        fu = DMSharedUsers().getFreeUser()
+        base64string = base64.encodestring('%s:%s' % (fu["login"], fu["password"])).replace('\n', '')
+        req.add_header("Authorization", "Basic %s" % base64string)
+
+        try:
+            res_data = urllib2.urlopen(req)
+        except urllib2.URLError, err:
+# TODO we should note this ...
+            print 'dliang url error' + url
+            print err
+            return {"error": 1}
+        except urllib2.HTTPError, err:
+            print '404 error'
+            if err.code == 404:
+                 return {"error": 1}
+        except httplib.HTTPException, err:
+            print 'http exception'
+            return {"error": 1}
+# TODO timeout
+        else:
+            res = res_data.read()
+            val = json.loads(res)
+            return {"error": 0, "val": val}
+
+        print "How to get here?"
+        return {"error": 1}
+

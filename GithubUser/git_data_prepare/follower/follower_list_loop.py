@@ -20,18 +20,11 @@ user_thread = []
 #    seems...Correct me if I were wrong
 def append_followers(gh_user_id, page):
     url = "https://api.github.com/users/"+gh_user_id+"/followers?page="+str(page);
-    req = urllib2.Request(url)
-    fu = DMSharedUsers().getFreeUser()
-    base64string = base64.encodestring('%s:%s' % (fu["login"], fu["password"])).replace('\n', '')
-    req.add_header("Authorization", "Basic %s" % base64string)   
-
-    res_data = urllib2.urlopen(req)
-    res = res_data.read()
-
-    val = json.loads(res)
+    res = DMSharedUsers.readURL(url)
     ret_val = []
-    for item in val:
-        ret_val.append ({"id": item["id"], "login": item["login"]})
+    if res["error"] == 0:
+        for item in res["val"]:
+            ret_val.append ({"id": item["id"], "login": item["login"]})
     return ret_val
 
 def upload_user_followers(db, user_login, user_count):
@@ -103,7 +96,10 @@ class myThread (threading.Thread):
             DMTask().addTask("github", self.task)
 
     def run(self):
-        if self.task["status"] == "finish":
+        if self.task["status"] == "error":
+            print "Task error, exiting the thread"
+            return
+        elif self.task["status"] == "finish":
             print "Task already finish, exiting the thread"
             return
         else:
