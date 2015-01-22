@@ -82,7 +82,13 @@ class GithubRepo:
                     return {"error": 0, "val": res}
                 else:
                     return {"error": 1}
-            res += ret_val["val"]
+# improve a little!
+            if len(ret_val["val"]) > 0:
+                res += ret_val["val"]
+                if len(ret_val["val"]) < 30:
+                    break
+            else:
+                break
             i += 1
 
         return {"error": 0, "val": res}

@@ -54,7 +54,12 @@ class GithubEvent:
                     return {"error": 0, "val": res}
                 else:
                     return {"error": 1}
-            res += ret_val["val"]
+            if len(ret_val["val"]) > 0:
+                res += ret_val["val"]
+                if len(ret_val["val"]) < 30:
+                    break
+            else:
+                break
             i += 1
 # simply return if event > 10..
             if i > 10:
@@ -68,6 +73,26 @@ class GithubEvent:
             print "Error in the task"
             return 0
         return 1
+
+# in case same client cannot access our db
+# we give them the logins and get json plain file in return
+    def generate(self, output_file):
+        info = self.task.getInfo()
+        start_id = info["start"]
+        end_id = info["end"]
+        if info.has_key("current"):
+            start_id = info["current"]
+            print "Find unfinished task, continue to work at " + str(start_id)
+
+        query = {"id": {"$gte": start_id, "$lt": end_id}}
+
+        res = self.db["user"].find(query).sort("id", pymongo.ASCENDING)
+        res_len = res.count()
+        i = 0
+        fw = open(output_file, "w")
+        for item in res:
+            fw.write(item["login"])
+            fw.write("\n")
 
 #task is the instance of DMTask
     def runTask(self):
