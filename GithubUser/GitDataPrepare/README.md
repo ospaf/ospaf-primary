@@ -2,45 +2,22 @@
 
 ## based on github openAPI, basic authentication
 
-+ deprecated
-- old script, write to '.txt'
+# task.py
+ - Command: ''
+ - get task from server, (lib for now)
+ - save the result to server directly
 
-+ Get user list by using 'get_data_between_a_b.py'
- - Command: 'python get_data_between_a_b.py  100 9000'
- - API Details: "https://api.github.com/users?since="+`gh_user_id`+"&page_size=100";
- - Output: save to `gh_user_id`.txt
-+ Get 'login' from all the `gh_user_id`.txt by using 'generate_logins.py'
- - Command: 'python generate_logins.py > new_file'
- - Output: new_file
-+ Get user details by using 'get_user_data_from_conf.py'
- - Command: 'python get_user_data_from_conf.py new_file begin_at end_with'
- - API Details: "https://api.github.com/users/"+`gh_user_id`
- - Output: save to lots of `gh_user_id`.txt
+# task_no_db.py
+ - Command: 'python task_no_db.py login_list_file'
+ - run the task by logins
+ - save the result to a local file and send to server again use another command
 
-+ Get user details by distribute the task ! 'task_distribute.py'
- - Command: 'python task_distribute.py'
- - simply, we can edit the configuration files in task_distribute.py
+# deprecated
+ - old scripts, saved to 'txt'
+ - just for keeping a good memory
 
-# Clean the downloaded users 'clean_thread.py'
- - Command: 'python clean_thread.py 0 > 0_to_50.new'
-
-# Send data to mongodb
- - Command: 'python upload_data.py'
- - Explain: each user file is in  a single.txt which is bad design...
-            Cause my ext3 inode issue which is a good lesson to me!
-
-# Find and save all the followers relationships
- - Command: 'python follower_tree.py'
- - Command: 'python follower_list_loop.py'
- - Using thread to download followers
- - Explain: follower_tree: start from one person and continue with all his/her followers like a tree
-            follower_list_loop: start from a list of people
-
-# Find and save all the repos of certain user
- - Command: 'python repo_list_loop.py'
- 
-# Find and save all the events of certain user
- - Command: 'python event_list_loop.py'
+# event follower repo user
+ - individul task 
  
 - - -
 Copyright 2014 Ospaf Lab Software, Inc. Unless otherwise marked, this work is licensed under a [Creative Commons Attribution 3.0 Unported License](http://creativecommons.org/licenses/by/3.0/).
