@@ -1,52 +1,83 @@
 import sys
 sys.path.append("../../..")
-import re
+
 import threading
-import socket
+
 import base64
 import json
-import httplib
 import urllib
 import urllib2
 import datetime
 import pymongo
 from pymongo import MongoClient
 from GithubUser.DMLib.DMDatabase import DMDatabase
-from GithubUser.DMLib.DMSharedUsers import DMSharedUsers
 from GithubUser.DMLib.DMTask import DMTask
+from GithubUser.DMLib.DMSharedUsers import DMSharedUsers
 
-class GithubEvent:
+class GithubFollowers:
     def __init__(self, task):
         self.task = task
         self.db = DMDatabase().getDB()
 
-    def append_event(self, gh_user_id, page):
-        url = "https://api.github.com/users/"+gh_user_id+"/events?page="+str(page);
+    def append_followers(self, gh_user_id, page):
+        url = "https://api.github.com/users/"+gh_user_id+"/followers?page="+str(page);
         return DMSharedUsers().readURL(url)
 
-    def upload_user_event(self, user_login):
-        need_update = 0
-        old_res = self.db["event"].find_one({"login": user_login})
+    def upload_user_followers(self, user_login, user_count):
+        need_update = 1
+        old_res = self.db["followers"].find_one({"login": user_login})
         if old_res:
-            return 0
+            if old_res.has_key("count"):
+                old_res_len = old_res["count"]
+                if (old_res_len > 0) and (user_count <= old_res_len): 
+                    print "saved"
+                    return 0
+            else:
+                old_res_len = len(old_res["followers"])
+                if (old_res_len > 0) and (user_count <= old_res_len): 
+                    print "saved, but need to update - add count prop"
+                    val = {"$set": {"count": old_res_len}}
+                    self.db["followers"].update({"login":user_login}, val)
+                    return 0
+        else:
+            need_update = 0
 
-        new_res = self.user_event_list(user_login)
+# new res is updated by calling api
+# TODO could be improved since the 'count' is already got
+# use the {} val is better
+
+        new_res = self.user_followers_list(user_login, user_count)
         if (new_res["error"] == 1):
 #TODO we should save this error in order to do it again!
             return 1
 
-        count = len(new_res["val"])
-
-        if count > 0:
-            print user_login + " added with " + str(count) + " counts"
-        self.db["event"].insert({"login": user_login, "event": new_res["val"], "count": count, "update_date": datetime.datetime.utcnow()})
+        new_res_count = len(new_res["val"])
+        if need_update == 0:
+            val = {"login": user_login, 
+                   "followers": new_res["val"],
+                   "count": new_res_count,
+                   "update_date": datetime.datetime.utcnow()
+                  }
+            self.db["followers"].insert(val)
+            print "insert " + user_login
+        else:
+            val = {"$set": {"update_date": datetime.datetime.utcnow(),
+                            "count": new_res_count,
+                            "followers": new_res["val"]}}
+            self.db["followers"].update({"login":user_login}, val)
+            print "update " + user_login
         return 0
 
-    def user_event_list(self, user_login):
+    def user_followers_list(self, user_login, count):
         res = []
+        if count <= 0:
+            return {"error": 1}
+# 30 is github system defined
+        page_size = 30
+        pages = count/30 + 1
         i = 1
-        while 1:
-            ret_val = self.append_event(user_login, i)
+        while i <= pages:
+            ret_val = self.append_followers(user_login, i)
             if ret_val["error"] == 1:
                 if i > 2:
 #   "message": "In order to keep the API fast for everyone, pagination is limited for this resource. Check the rel=last link relation in the Link response header to see how far back you can traverse.",
@@ -56,9 +87,6 @@ class GithubEvent:
                     return {"error": 1}
             res += ret_val["val"]
             i += 1
-# simply return if event > 10..
-            if i > 10:
-                break
 
         return {"error": 0, "val": res}
 
@@ -69,7 +97,6 @@ class GithubEvent:
             return 0
         return 1
 
-#task is the instance of DMTask
     def runTask(self):
         if self.validateTask() == 0:
             return
@@ -83,18 +110,16 @@ class GithubEvent:
             start_id = info["current"]
             print "Find unfinished task, continue to work at " + str(start_id)
 
-        query = {"id": {"$gte": start_id, "$lt": end_id}}
-
+        query = {"$and": [{"id": {"$gte": start_id, "$lt": end_id}}, {"followers": {"$gt": 0}}]}
+        
         res = self.db["user"].find(query).sort("id", pymongo.ASCENDING)
         res_len = res.count()
         i = 0
         percent_gap = res_len/100
         for item in res:
-            updated_date_int = item["updated_at_int"]
             i += 1
-            if updated_date_int < 20141000:
-                continue 
-            ret = self.upload_user_event(item["login"])
+            f_count = item["followers"]
+            ret = self.upload_user_followers(item["login"], f_count)
             if ret == 1:
 #TODO make a better error message
                 self.task.error({"login": item["login"], "message": "error in upload_user_event"})
@@ -113,13 +138,12 @@ class GithubEvent:
 
 def test():
     task1 = DMTask()
-    val = {"name": "fake-event", "action_type": "loop", "start": 6001000, "end": 6005000}
+    val = {"name": "fake-followers", "action_type": "loop", "start": 6001000, "end": 6005000}
 
     task1.init_test("github", val)
-    e1 = GithubEvent(task1)
+    e1 = GithubFollowers(task1)
     e1.runTask()
     task1.remove()
 
 #test()
-
 
