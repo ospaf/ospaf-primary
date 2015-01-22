@@ -91,7 +91,7 @@ def gen_event(start, end):
         file = "./TaskFiles/get_events_start_" + str(i*gap)
         r1.generate(file)
 
-def main():
+def main_unit():
     cmd = sys.argv[1]
     start = long(sys.argv[2])
     end = long(sys.argv[3])
@@ -107,4 +107,55 @@ def main():
     elif cmd == "gen-event":
         gen_event(start, end)
 
-main()
+user_thread = []
+gap = 1000
+
+class myThread (threading.Thread):
+    def __init__(self, cmd, start, end):
+        threading.Thread.__init__(self)
+        self.task = DMTask()
+        self.r = None
+        self.val = {"action_type": "loop", "start": start * gap, "end": end*gap}
+        if cmd == "repo":
+            self.val["name"] = "get_repos"
+            self.task.init("github", self.val)
+            self.r = GithubRepo(self.task)
+        elif cmd == "followers":
+            self.val["name"] = "get_followers"
+            self.task.init("github", self.val)
+            self.r = GithubFollowers(self.task)
+        elif cmd == "event":
+            self.val["name"] = "get_events"
+            self.task.init("github", self.val)
+            self.r = GithubEvent(self.task)
+        else:
+            print "Failed to init the task"
+
+    def run(self):
+        print "Starting " + str(self.val)
+        if self.r:
+            self.r.runTask()
+        print "Exiting " + str(self.val)
+
+def run_task():
+    for item in user_thread:
+        item.start()
+
+def main_loop():
+    cmd = sys.argv[1]
+    start = long(sys.argv[2])
+    end = long(sys.argv[3])
+
+    if start >= 1000 and end <= 1200:
+        print "this is used for server ..."
+        return
+
+    for i in range (start, end):
+        new_thread = myThread(cmd, i, i+1)
+        user_thread.append(new_thread)
+
+    run_task()
+
+main_loop()
+                      
+
