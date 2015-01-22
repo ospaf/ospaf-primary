@@ -151,9 +151,9 @@ def main():
     db = DMDatabase().getDB()
     if db:
         total = 10490000
-        gap_num = 10000
-        thread_num = 1000
-        start = 0
+        gap_num = 1000
+        thread_num = 30
+        start = 200
         for i in range(start, thread_num+start):
             start_id = i * gap_num
             end_id = (i+1) * gap_num

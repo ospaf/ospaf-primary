@@ -55,14 +55,15 @@ class DMTask:
             return None
         else:
             return self.col.find_one({"_id": self._id})
- 
-    def error(self, login, msg):
+
+# the content of val is client defined
+    def error(self, val):
         res = self.col.find_one({"_id": self._id})
         if res:
             error_tasks = []
             if res.has_key("error"):
                error_tasks=res["error"]
-            error_tasks.append({"login":login, "msg": msg})
+            error_tasks.append(val)
             error_task_count = len (error_tasks)
             self.col.update({"_id": self._id}, {"$set": {"error": error_tasks, "error_count": error_task_count}}) 
         
@@ -117,7 +118,7 @@ class DMTask:
         if req.has_key("query"):
             query = req["query"]
             query["status"] = "init"
-        else
+        else:
             query["status"] = "init"
         return DMTask.__task_db__[req["col"]].find(query).limit(req["num"])
 
@@ -135,7 +136,7 @@ def test1():
     dm_task1.status()
     print dm_task1.updateStatus ("in progress")
     dm_task1.update({"percent" : 0.1})
-    dm_task1.error("fakeuser", "error in test")
+    dm_task1.error({"login": "fakeuser", "message":"error in test"})
     dm_task1.status()
 
     res = DMTask().findTask(col, task1)

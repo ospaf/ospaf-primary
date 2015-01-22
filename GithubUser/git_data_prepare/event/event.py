@@ -95,7 +95,7 @@ class GithubEvent:
             ret = self.upload_user_event(item["login"])
             if ret == 1:
 #TODO make a better error message
-                self.task.error(item["login"], "error in upload_user_event")
+                self.task.error({"login": item["login"], "message": "error in upload_user_event"})
                 continue
 
             if percent_gap == 0:
@@ -111,13 +111,13 @@ class GithubEvent:
 
 def test():
     task1 = DMTask()
-    val = {"name": "fake-event", "action_type": "loop", "start": 6000000, "end": 6001000}
+    val = {"name": "fake-event", "action_type": "loop", "start": 6001000, "end": 6005000}
 
     task1.init_test("github", val)
     e1 = GithubEvent(task1)
     e1.runTask()
     task1.remove()
 
-#test()
+test()
 
 
