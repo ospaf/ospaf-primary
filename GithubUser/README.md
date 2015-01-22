@@ -5,10 +5,10 @@
 # DMLib
 - Data mining lib
 
-# git_data_prepare
+# GitDataPrepare
 - A couple of tools to get data from github and insert into our database. (mongodb in my case)
 
-# git_data_analysis
+# GitDataAnalysis
 - A couple of tools to do the research
 
 # Reports
