@@ -125,7 +125,7 @@ class myThread (threading.Thread):
         threading.Thread.__init__(self)
         self.task = DMTask()
         self.r = None
-        self.val = {"action_type": "loop", "start": start * gap, "end": end*gap}
+        self.val = {"action_type": "loop", "start": start, "end": end}
         if cmd == "repo":
             self.val["name"] = "get_repos"
             self.task.init("github", self.val)
