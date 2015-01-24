@@ -134,7 +134,7 @@ class myThread (threading.Thread):
             self.val["name"] = "get_followers"
             self.task.init("github", self.val)
             self.r = GithubFollowers(self.task)
-        elif cmd == "event":
+        elif cmd == "get_events":
             self.val["name"] = "get_events"
             self.task.init("github", self.val)
             self.r = GithubEvent(self.task)
