@@ -121,8 +121,12 @@ user_thread = []
 gap = 1000
 
 class myThread (threading.Thread):
-    def __init__(self, cmd, start, end):
+    def __init__(self, cmd, start, end, endless):
         threading.Thread.__init__(self)
+        self.endless = endless
+        self.set(cmd, start, end)
+
+    def set(self, cmd, start, end):
         self.task = DMTask()
         self.r = None
         self.val = {"action_type": "loop", "start": start, "end": end}
@@ -140,12 +144,28 @@ class myThread (threading.Thread):
             self.r = GithubEvent(self.task)
         else:
             print "Failed to init the task"
+            return 0
+        return 1
 
     def run(self):
         print "Starting " + str(self.val)
         if self.r:
             self.r.runTask()
         print "Exiting " + str(self.val)
+
+        if self.endless == 1:
+            while 1:
+                query = {"col": "github", "num": 1, "query": {"status": "init"}}
+                res = DMTask().getFreeTasks(query)
+                if res:
+                    for item in res:
+                        print item
+                        if self.set(item["name"], item["start"], item["end"]) == 1:
+                            self.r.runTask()
+                        else:
+                            return
+                        print "\n Start another task in the finished thread\n"
+                        break
 
 def run_task():
     for item in user_thread:
@@ -169,21 +189,25 @@ def main_loop():
 
     run_task()
 
-def main_free_task():
-    if len(sys.argv) < 2:
-        print "Please input the task you need to get"
-        return
-
-    num = long(sys.argv[1])
+def run_free_task(num, endless):
     query = {"col": "github", "num": num, "query": {"status": "init"}}
     res = DMTask().getFreeTasks(query)
     i = 0
     for item in res:
-        new_thread = myThread(item["name"], item["start"], item["end"])
+        new_thread = myThread(item["name"], item["start"], item["end"], endless)
         user_thread.append(new_thread)
         i += 1
     print str(i) + " task received, start to run them!"
     run_task()
 
 #main_loop()
+def main_free_task():
+    if len(sys.argv) < 2:
+        print "Please input the task you need to get"
+        return
+
+    num = long(sys.argv[1])
+    endless = 1
+    run_free_task(num, endless)
+
 main_free_task()

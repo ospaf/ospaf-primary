@@ -185,6 +185,13 @@ def fix_add_login():
                 db["event"].update({"login": login}, {"$set": {"id": user_item["id"]}})
         print num
 
+# since I find each 1000 - id task only get less than 200 event records.. so I need to double check
+def check_task(task):
+    db = DMDatabase().getDB()
+    count1 = db["user"].find({"id": {"$gte": task["start"], "$lt": task["end"]}, "updated_at_int": {"$gte": 20141000}}).count()
+    count2 = db["event"].find({"id": {"$gte": task["start"], "$lt": task["end"]}}).count()
+    print str(count1) + ' in user and ' + str(count2) + ' in event'
+
 def test():
     task1 = DMTask()
     val = {"name": "fake-event", "action_type": "loop", "start": 6001000, "end": 6005000}
@@ -197,3 +204,7 @@ def test():
 #test()
 
 #fix_add_login()
+
+#so far, the check_task is write..
+#check_task({"start": 3888000, "end": 3889000})
+#check_task({"start": 4512000, "end": 4513000})
