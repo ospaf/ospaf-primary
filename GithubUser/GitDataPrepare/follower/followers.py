@@ -23,7 +23,7 @@ class GithubFollowers:
         url = "https://api.github.com/users/"+gh_user_id+"/followers?page="+str(page);
         return DMSharedUsers().readURL(url)
 
-    def upload_user_followers(self, user_login, user_count):
+    def upload_user_followers(self, user_login, user_id, user_count):
         need_update = 1
         old_res = self.db["followers"].find_one({"login": user_login})
         if old_res:
@@ -54,6 +54,7 @@ class GithubFollowers:
         new_res_count = len(new_res["val"])
         if need_update == 0:
             val = {"login": user_login, 
+                   "id": use_id,
                    "followers": new_res["val"],
                    "count": new_res_count,
                    "update_date": datetime.datetime.utcnow()
@@ -125,7 +126,7 @@ class GithubFollowers:
         for item in res:
             i += 1
             f_count = item["followers"]
-            ret = self.upload_user_followers(item["login"], f_count)
+            ret = self.upload_user_followers(item["login"], item["id"], f_count)
             if ret == 1:
 #TODO make a better error message
                 self.task.error({"login": item["login"], "message": "error in upload_user_event"})

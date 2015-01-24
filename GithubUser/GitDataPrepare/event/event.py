@@ -24,7 +24,8 @@ class GithubEvent:
         url = "https://api.github.com/users/"+gh_user_id+"/events?page="+str(page);
         return DMSharedUsers().readURL(url)
 
-    def upload_user_event(self, user_login):
+# add a user id is better way to split the event work ..
+    def upload_user_event(self, user_login, user_id):
         need_update = 0
         old_res = self.db["event"].find_one({"login": user_login})
         if old_res:
@@ -39,7 +40,7 @@ class GithubEvent:
 
         if count > 0:
             print user_login + " added with " + str(count) + " counts"
-        self.db["event"].insert({"login": user_login, "event": new_res["val"], "count": count, "update_date": datetime.datetime.utcnow()})
+        self.db["event"].insert({"login": user_login, "id": user_id, "event": new_res["val"], "count": count, "update_date": datetime.datetime.utcnow()})
         return 0
 
     def user_event_list(self, user_login):
@@ -94,6 +95,32 @@ class GithubEvent:
             fw.write(item["login"])
             fw.write("\n")
 
+    def runTaskFromFile(self, input_file):
+        if self.validateTask() == 0:
+            return
+        if self.task.updateStatus("running") != 0:
+            return
+        print "import " + input_file
+        fo = open(input_file, "r")
+        content = fo.read()
+        fo.close()
+        content_len = len(content)
+        val = {}
+        if content[content_len-1] == ']':
+            val = json.loads(content)
+        else:
+#Dirty.. yes 
+            val = json.loads(content+']')
+        for item in val:
+            res = self.db["event"].find_one({"login": item["login"]})
+            if res:
+#TODO compare by the updatetime to make sure if we need to update or just skip it
+                self.db["event"].update({"login": item["login"]}, {"$set": item}) 
+            else:
+                self.db["event"].insert(item)
+#TODO we need to verify it since we are not sure if all the data were OK
+        print "Task data imported but not finish, exiting the thread"
+
 #task is the instance of DMTask
     def runTask(self):
         if self.validateTask() == 0:
@@ -119,7 +146,7 @@ class GithubEvent:
             i += 1
             if updated_date_int < 20141000:
                 continue 
-            ret = self.upload_user_event(item["login"])
+            ret = self.upload_user_event(item["login"], item["id"])
             if ret == 1:
 #TODO make a better error message
                 self.task.error({"login": item["login"], "message": "error in upload_user_event"})

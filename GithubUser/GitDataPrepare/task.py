@@ -91,6 +91,16 @@ def gen_event(start, end):
         file = "./TaskFiles/get_events_start_" + str(i*gap)
         r1.generate(file)
 
+def import_event(start, end):
+    gap = 1000
+    for i in range (start, end):
+        task = DMTask()
+        val = {"name": "get_events", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
+        task.init("github", val)
+        r1 = GithubEvent(task)
+        file = "./TaskFinishedFiles/get_events_start_" + str(i*gap)+".output"
+        r1.runTaskFromFile(file)
+
 def main_unit():
     cmd = sys.argv[1]
     start = long(sys.argv[2])
@@ -146,8 +156,11 @@ def main_loop():
     start = long(sys.argv[2])
     end = long(sys.argv[3])
 
-    if start >= 1000 and end <= 1200:
-        print "this is used for server ..."
+    if cmd == "gen_event":
+        gen_event (start, end)   
+        return
+    elif cmd == "import_event":
+        import_event (start, end)
         return
 
     for i in range (start, end):

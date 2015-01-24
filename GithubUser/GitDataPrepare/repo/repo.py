@@ -23,7 +23,7 @@ class GithubRepo:
         url = "https://api.github.com/users/"+gh_user_id+"/repos?page="+str(page);
         return DMSharedUsers().readURL(url)
 
-    def upload_user_repos(self, user_login, user_count):
+    def upload_user_repos(self, user_login, user_id, user_count):
         need_update = 1
         old_res = self.db["repos"].find_one({"login": user_login})
         if old_res:
@@ -51,6 +51,7 @@ class GithubRepo:
 
         if need_update == 0:
             val = {"login": user_login, 
+                   "id":    user_id,
                    "repos": new_res["val"],
                    "count": new_res_count,
                    "update_date": datetime.datetime.utcnow()
@@ -127,7 +128,7 @@ class GithubRepo:
         for item in res:
             i += 1
             r_count = item["public_repos"]
-            ret = self.upload_user_repos(item["login"], r_count)
+            ret = self.upload_user_repos(item["login"], item["id"], r_count)
             if ret == 1:
 #TODO make a better error message
                 self.task.error({"login": item["login"], "message": "error in upload_user_repo"})
