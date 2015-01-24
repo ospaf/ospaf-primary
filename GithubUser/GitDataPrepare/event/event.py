@@ -154,7 +154,7 @@ class GithubEvent:
             ret = self.upload_user_event(item["login"], item["id"])
             if ret == 1:
 #TODO make a better error message
-                self.task.error({"login": item["login"], "message": "error in upload_user_event"})
+                self.task.error({"login": item["login"], "id": item["id"], "message": "error in upload_user_event"})
                 continue
 
             if percent_gap == 0:
@@ -175,11 +175,33 @@ def init_event_task():
     start = 0
 # end id is now set to 10300000
     end = 10300  
+    db = DMDatabase().getDB()
     for i in range (start, end):
         task = DMTask()
         val = {"name": "get_events", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
         task.init("github", val)
-        r1 = GithubEvent(task)
+        info = task.getInfo()
+        if info.has_key("error"):
+            update_error = []
+            list = info["error"]
+            for item in list:
+                login = item["login"]
+                id = 0
+                if item.has_key("id"):
+                    id = item["id"] 
+                else:
+                    user_res = db["user"].find_one({"login": login})
+                    if user_res:
+                        id = user_res["id"]
+                    else:
+                        continue
+                ret = task.upload_user_event(login, id)
+# error
+                if ret == 1:
+                    update_error.append({"login": login, "id": id, "message": "error even in double upload_user_event"})
+            error_len = len(update_error)
+            task.update({"error": update_error, "error_count": error_len})
+
 
 def fix_add_login():
     db = DMDatabase().getDB()
