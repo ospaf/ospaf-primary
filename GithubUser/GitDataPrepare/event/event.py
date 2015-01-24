@@ -82,7 +82,7 @@ class GithubEvent:
 
 # in case same client cannot access our db
 # we give them the logins and get json plain file in return
-    def generate(self, output_file):
+    def generateToFile(self, output_file):
         info = self.task.getInfo()
         start_id = info["start"]
         end_id = info["end"]
@@ -168,6 +168,19 @@ class GithubEvent:
         self.task.update({"status": "finish", "current": end_id, "percent": 1.0, "update_date": datetime.datetime.utcnow()})
         print "Task finish, exiting the thread"
 
+# very important, the entry function
+def init_event_task():
+# TODO: 1000 is system defined, maybe add to DMTask? or config file?
+    gap = 1000
+    start = 0
+# end id is now set to 10300000
+    end = 10300  
+    for i in range (start, end):
+        task = DMTask()
+        val = {"name": "get_events", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
+        task.init("github", val)
+        r1 = GithubEvent(task)
+
 def fix_add_login():
     db = DMDatabase().getDB()
 #2730627
@@ -200,6 +213,8 @@ def test():
     e1 = GithubEvent(task1)
     e1.runTask()
     task1.remove()
+
+#init_event_task()
 
 #test()
 
