@@ -32,6 +32,7 @@ class DMTask:
             print "use saved task"
         else:
             task["status"] = "init"
+            task["percent"] = 0.0
             _id = self.col.insert(task)
             self._id = ObjectId(_id)
             print "new task added"
@@ -46,6 +47,7 @@ class DMTask:
             print "use saved task"
         else:
             task["status"] = "init"
+            task["percent"] = 0.0
             _id = self.col.insert(task)
             self._id = ObjectId(_id)
             print "new task added"
@@ -105,6 +107,7 @@ class DMTask:
     def findTask(self, col, task):
         return DMTask.__task_db__[col].find_one(task)
 
+#TODO: we need to lock or check the real task ...by updatetime?
 #num is the tasks each client want to have
     def getFreeTasks(self, req):
 #      {"col": "github", 
@@ -117,10 +120,9 @@ class DMTask:
         query = {}
         if req.has_key("query"):
             query = req["query"]
-            query["status"] = "init"
         else:
             query["status"] = "init"
-        return DMTask.__task_db__[req["col"]].find(query).limit(req["num"])
+        return DMTask.__task_db__[req["col"]].find(query).sort("percent", pymongo.ASCENDING).limit(req["num"])
 
 def test1():
     col = "github"

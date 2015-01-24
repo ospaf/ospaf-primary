@@ -169,6 +169,21 @@ def main_loop():
 
     run_task()
 
-main_loop()
-                      
+def main_free_task():
+    if len(sys.argv) < 2:
+        print "Please input the task you need to get"
+        return
 
+    num = long(sys.argv[1])
+    query = {"col": "github", "num": num, "query": {"status": "init"}}
+    res = DMTask().getFreeTasks(query)
+    i = 0
+    for item in res:
+        new_thread = myThread(item["name"], item["start"], item["end"])
+        user_thread.append(new_thread)
+        i += 1
+    print str(i) + " task received, start to run them!"
+    run_task()
+
+#main_loop()
+main_free_task()

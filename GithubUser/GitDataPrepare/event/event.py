@@ -29,7 +29,12 @@ class GithubEvent:
         need_update = 0
         old_res = self.db["event"].find_one({"login": user_login})
         if old_res:
-            return 0
+            if old_res.has_key("id"):
+                return 0
+            else:
+# it is a patch .. because we don't save id earlier ..
+                self.db["event"].update({"login": user_login}, {"$set": {"id": user_id}})
+                return 0
 
         new_res = self.user_event_list(user_login)
         if (new_res["error"] == 1):
@@ -163,6 +168,23 @@ class GithubEvent:
         self.task.update({"status": "finish", "current": end_id, "percent": 1.0, "update_date": datetime.datetime.utcnow()})
         print "Task finish, exiting the thread"
 
+def fix_add_login():
+    db = DMDatabase().getDB()
+#2730627
+    gap = 1000
+    num = 0
+    for i in range(0, 2740):
+        res =db["event"].find().limit(1000).skip(i*1000)
+        for item in res:
+            num += 1
+            if item.has_key("id"):
+                continue
+            login = item["login"]
+            user_item = db["user"].find_one({"login": login})
+            if user_item:
+                db["event"].update({"login": login}, {"$set": {"id": user_item["id"]}})
+        print num
+
 def test():
     task1 = DMTask()
     val = {"name": "fake-event", "action_type": "loop", "start": 6001000, "end": 6005000}
@@ -174,4 +196,4 @@ def test():
 
 #test()
 
-
+#fix_add_login()
