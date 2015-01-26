@@ -168,6 +168,57 @@ class GithubEvent:
         self.task.update({"status": "finish", "current": end_id, "percent": 1.0, "update_date": datetime.datetime.utcnow()})
         print "Task finish, exiting the thread"
 
+#return the solved errors
+    def error_check (self):
+        info = self.task.getInfo()
+        if info["status"] != "finish":
+            return 0
+
+        count = 0
+        if info.has_key("error"):
+            if info["error_count"] < 10:
+                return 0
+            update_error = []
+            list = info["error"]
+            for item in list:
+                login = item["login"]
+                if self.db["event"].find_one({"login": login}):
+                    count += 1
+                    continue
+                id = 0
+                if item.has_key("id"):
+                    id = item["id"] 
+                else:
+                    user_res = self.db["user"].find_one({"login": login})
+                    if user_res:
+                        id = user_res["id"]
+                    else:
+                        continue
+                ret = self.upload_user_event(login, id)
+# error
+                if ret == 1:
+                    update_error.append({"login": login, "id": id, "message": "error even in double upload_user_event"})
+                else:
+                    count += 1
+            error_len = len(update_error)
+            self.task.update({"error": update_error, "error_count": error_len})
+        return count
+
+def resolve_event_errors():
+    gap = 1000
+    start = 0
+# end id is now set to 10300000
+    end = 10300  
+    count = 0
+    for i in range (start, end):
+        task = DMTask()
+        val = {"name": "get_events", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
+        task.init("github", val)
+        r = GithubEvent(task)
+        res = r.error_check()
+        count += res
+    print str(count) + " errors solved"
+
 # very important, the entry function
 def init_event_task():
 # TODO: 1000 is system defined, maybe add to DMTask? or config file?
@@ -206,19 +257,38 @@ def init_event_task():
 def fix_add_login():
     db = DMDatabase().getDB()
 #2730627
-    gap = 1000
+    gap = 100
     num = 0
-    for i in range(0, 2740):
-        res =db["event"].find().limit(1000).skip(i*1000)
-        for item in res:
-            num += 1
-            if item.has_key("id"):
-                continue
+    i = 0
+    while 1:
+        item = db['event'].find_one({"id": {"$exists":False}})
+        if item:
             login = item["login"]
+            print login
             user_item = db["user"].find_one({"login": login})
-            if user_item:
+            db["event"].update({"login": login}, {"$set": {"id": user_item["id"]}})
+        else:
+            return
+    return 
+
+    while 1:
+        print 'begin'
+        res =db["event"].find({"id": {"$exists": False}}).limit(gap)
+        print 'end'
+        if res:
+            print res.count()
+            if res.count() == 0:
+                return 
+            for item in res:
+                num += 1
+                login = item["login"]
+                user_item = db["user"].find_one({"login": login})
                 db["event"].update({"login": login}, {"$set": {"id": user_item["id"]}})
+        else:
+            print 'exit'
+            return
         print num
+        i += 1
 
 # since I find each 1000 - id task only get less than 200 event records.. so I need to double check
 def check_task(task):
@@ -240,6 +310,7 @@ def test():
 
 #test()
 
+#resolve_event_errors()
 #fix_add_login()
 
 #so far, the check_task is write..
