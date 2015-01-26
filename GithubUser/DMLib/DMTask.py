@@ -14,6 +14,7 @@ from DMDatabase import DMDatabase
 #       use ping to show the client is alive? or we add a timeout to each task record?
 
 class DMTask:
+#TODO each  db is a connection? will it be faster to open more db in each db?
     __task_client__ = None
     __task_db__ = None
     def __init__(self):

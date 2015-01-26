@@ -145,6 +145,18 @@ class GithubRepo:
         self.task.update({"status": "finish", "current": end_id, "percent": 1.0, "update_date": datetime.datetime.utcnow()})
         print "Task finish, exiting the thread"
 
+# very important, the entry function
+def init_repo_task():
+# TODO: 1000 is system defined, maybe add to DMTask? or config file?
+    gap = 1000
+    start = 0
+# end id is now set to 10300000
+    end = 10300
+    db = DMDatabase().getDB()
+    for i in range (start, end):
+        task = DMTask()
+        val = {"name": "get_repos", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
+        task.init("github", val)
 
 def test():
     task1 = DMTask()
