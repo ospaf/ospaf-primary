@@ -123,7 +123,8 @@ class GithubFollowers:
         res_len = res.count()
         i = 0
         percent_gap = res_len/100
-        for item in res:
+        res_list = list(res)
+        for item in res_list:
             i += 1
             f_count = item["followers"]
             ret = self.upload_user_followers(item["login"], item["id"], f_count)

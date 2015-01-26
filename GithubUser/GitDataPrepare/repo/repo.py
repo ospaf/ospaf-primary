@@ -125,7 +125,8 @@ class GithubRepo:
         res_len = res.count()
         i = 0
         percent_gap = res_len/100
-        for item in res:
+        res_list = list(res)
+        for item in res_list:
             i += 1
             r_count = item["public_repos"]
             ret = self.upload_user_repos(item["login"], item["id"], r_count)

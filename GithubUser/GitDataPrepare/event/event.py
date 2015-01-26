@@ -146,7 +146,11 @@ class GithubEvent:
         res_len = res.count()
         i = 0
         percent_gap = res_len/100
-        for item in res:
+# I suspect when the upload takes too long
+# the res will miss, CursorNotFound: cursor id '116709267398' not valid at server
+# so maybe I should save the id list first
+        res_list = list(res)
+        for item in res_list:
             updated_date_int = item["updated_at_int"]
             i += 1
             if updated_date_int < 20141000:
@@ -237,17 +241,6 @@ def fix_add_login():
 #2730627
     gap = 100
     num = 0
-    i = 0
-    while 1:
-        item = db['event'].find_one({"id": {"$exists":False}})
-        if item:
-            login = item["login"]
-            print login
-            user_item = db["user"].find_one({"login": login})
-            db["event"].update({"login": login}, {"$set": {"id": user_item["id"]}})
-        else:
-            return
-    return 
 
     while 1:
         print 'begin'
@@ -266,7 +259,6 @@ def fix_add_login():
             print 'exit'
             return
         print num
-        i += 1
 
 # since I find each 1000 - id task only get less than 200 event records.. so I need to double check
 def check_task(task):
