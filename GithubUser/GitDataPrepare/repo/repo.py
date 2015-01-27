@@ -125,7 +125,14 @@ class GithubRepo:
         res_len = res.count()
         i = 0
         percent_gap = res_len/100
-        res_list = list(res)
+# When the upload takes too long, the cursor will miss
+#    cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT)
+# CursorNotFound: cursor id '116709267398' not valid at server
+# I should save the id list first
+        res_list = []
+        for item in res:
+            res_list.append({"login": item["login"], "id": item["id"], "public_repos": item["public_repos"]})
+
         for item in res_list:
             i += 1
             r_count = item["public_repos"]

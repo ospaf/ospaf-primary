@@ -146,10 +146,14 @@ class GithubEvent:
         res_len = res.count()
         i = 0
         percent_gap = res_len/100
-# I suspect when the upload takes too long
-# the res will miss, CursorNotFound: cursor id '116709267398' not valid at server
-# so maybe I should save the id list first
-        res_list = list(res)
+# When the upload takes too long, the cursor will miss
+#    cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT)
+# CursorNotFound: cursor id '116709267398' not valid at server
+# I should save the id list first
+        res_list = []
+        for item in res:
+            res_list.append({"login": item["login"], "id": item["id"], "updated_at_int": item["updated_at_int"]})
+
         for item in res_list:
             updated_date_int = item["updated_at_int"]
             i += 1
@@ -268,6 +272,14 @@ def check_task(task):
     print str(count1) + ' in user and ' + str(count2) + ' in event'
 
 def test():
+    db = DMDatabase().getDB()
+    res = db["event"].find({"id": {"$gte": 1000, "$lt": 200}}).limit(20)
+    if res is None:
+        print 'res is none'
+    else:
+        print res.count()
+    return
+
     task1 = DMTask()
     val = {"name": "fake-event", "action_type": "loop", "start": 6001000, "end": 6005000}
 

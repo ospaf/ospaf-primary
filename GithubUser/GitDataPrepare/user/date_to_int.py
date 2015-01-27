@@ -21,7 +21,7 @@ def date_string_to_int(date_string):
     num = int(date_string[0:4])*10000+int(date_string[5:7])*100+int(date_string[8:10])
     return num
 
-def fix_event():
+def fix_event_loop():
     db = DMDatabase().getDB()
 
     total = 1050
@@ -43,6 +43,21 @@ def fix_event():
             db["user"].update({"login": item["login"]}, {"$set": {"created_at_int": created_at_int, "updated_at_int": updated_at_int}})
         i += 1
         print i
+    print "Finish"
+
+def fix_event():
+    db = DMDatabase().getDB()
+    i = 0
+    query = {"updated_at_int": {"$exists": False}}
+    res = db["user"].find(query)
+    for item in res:
+        created_at_string = item["created_at"]
+        updated_at_string = item["updated_at"]
+        created_at_int = date_string_to_int(created_at_string)
+        updated_at_int = date_string_to_int(updated_at_string)
+        db["user"].update({"login": item["login"]}, {"$set": {"created_at_int": created_at_int, "updated_at_int": updated_at_int}})
+        i += 1
+    print i
     print "Finish"
 
 fix_event()
