@@ -89,7 +89,7 @@ def gen_event(start, end):
         task.init("github", val)
         r1 = GithubEvent(task)
         file = "./TaskFiles/get_events_start_" + str(i*gap)
-        r1.generate(file)
+        r1.generateToFile(file)
 
 def import_event(start, end):
     gap = 1000
@@ -130,11 +130,11 @@ class myThread (threading.Thread):
         self.task = DMTask()
         self.r = None
         self.val = {"action_type": "loop", "start": start, "end": end}
-        if cmd == "repo":
+        if cmd == "get_repos":
             self.val["name"] = "get_repos"
             self.task.init("github", self.val)
             self.r = GithubRepo(self.task)
-        elif cmd == "followers":
+        elif cmd == "get_followers":
             self.val["name"] = "get_followers"
             self.task.init("github", self.val)
             self.r = GithubFollowers(self.task)
