@@ -50,7 +50,7 @@ class GithubUser:
                 updated_at_int = date_string_to_int(updated_at_string)
                 val["created_at_int"] = created_at_int
                 val["updated_at_int"] = updated_at_int
-                if self.db["user"].find_one("login": item["login"]):
+                if self.db["user"].find_one({"login": item["login"]}):
                     self.db["user"].update({"login": item["login"]}, {"$set": val})
                 else:
                     self.db["user"].insert(val)

@@ -143,10 +143,11 @@ class myThread (threading.Thread):
             self.val["name"] = "get_events"
             self.task.init("github", self.val)
             self.r = GithubEvent(self.task)
-        elif cmd == "get_users":
-            self.val["name"] = "get_users"
-            self.task.init("github", self.val)
-            self.r = GithubUser(self.task)
+# TODO: do not support now
+#        elif cmd == "get_users":
+#            self.val["name"] = "get_users"
+#            self.task.init("github", self.val)
+#            self.r = GithubUser(self.task)
         elif cmd == "get_repositories":
             self.val["name"] = "get_repositories"
             self.task.init("github", self.val)
@@ -217,7 +218,7 @@ def main_free_task():
         return
 
     num = long(sys.argv[1])
-    endless = 0
+    endless = 1
     run_free_task(num, endless)
 
 main_free_task()
