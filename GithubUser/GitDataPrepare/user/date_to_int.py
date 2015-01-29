@@ -21,7 +21,7 @@ def date_string_to_int(date_string):
     num = int(date_string[0:4])*10000+int(date_string[5:7])*100+int(date_string[8:10])
     return num
 
-def fix_event_loop():
+def fix_user_loop():
     db = DMDatabase().getDB()
 
     total = 1050
@@ -45,7 +45,7 @@ def fix_event_loop():
         print i
     print "Finish"
 
-def fix_event():
+def fix_user():
     db = DMDatabase().getDB()
     i = 0
     query = {"updated_at_int": {"$exists": False}}
@@ -60,5 +60,5 @@ def fix_event():
     print i
     print "Finish"
 
-fix_event()
+fix_user()
 

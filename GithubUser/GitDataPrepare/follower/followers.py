@@ -76,6 +76,7 @@ class GithubFollowers:
 # 30 is github system defined
         page_size = 30
         pages = count/30 + 1
+#TODO: shall we limit the page? I don't meet it yet..
         i = 1
         while i <= pages:
             ret_val = self.append_followers(user_login, i)
@@ -180,10 +181,9 @@ def fix_add_count_id_created_at_int():
                 continue
             else:
                 if old_item.has_key("count"):
-                    db["repos"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"]}})
+                    db["followers"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"]}})
                 else:
-                    old_count = len(old_item["repos"])
-                    db["repos"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"], "count": old_count}})
+                    db["followers"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"], "count": item["followers"]}})
         print i
 
 def test():

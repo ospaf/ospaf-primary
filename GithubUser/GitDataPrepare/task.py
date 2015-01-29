@@ -18,8 +18,9 @@ from GithubUser.DMLib.DMSharedUsers import DMSharedUsers
 from GithubUser.DMLib.DMTask import DMTask
 
 from event.event import GithubEvent
-from repo.repo import GithubRepo
+from user_repo.repo import GithubRepo
 from follower.followers import GithubFollowers
+from repositories.repositories import GithubRepositories
 
 def test1():
     task = DMTask()
@@ -142,6 +143,14 @@ class myThread (threading.Thread):
             self.val["name"] = "get_events"
             self.task.init("github", self.val)
             self.r = GithubEvent(self.task)
+        elif cmd == "get_users":
+            self.val["name"] = "get_users"
+            self.task.init("github", self.val)
+            self.r = GithubUser(self.task)
+        elif cmd == "get_repositories":
+            self.val["name"] = "get_repositories"
+            self.task.init("github", self.val)
+            self.r = GithubRepositories(self.task)
         else:
             print "Failed to init the task"
             return 0
@@ -191,6 +200,7 @@ def main_loop():
 
 def run_free_task(num, endless):
     query = {"col": "github", "num": num, "query": {"status": "init"}}
+#    query = {"col": "obs", "num": num, "query": {"status": "init"}}
     res = DMTask().getFreeTasks(query)
     i = 0
     for item in res:
@@ -207,7 +217,7 @@ def main_free_task():
         return
 
     num = long(sys.argv[1])
-    endless = 1
+    endless = 0
     run_free_task(num, endless)
 
 main_free_task()

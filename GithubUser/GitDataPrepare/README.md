@@ -16,8 +16,14 @@
  - old scripts, saved to 'txt'
  - just for keeping a good memory
 
-# event follower repo user
+# event follower user_repo user
  - individul task 
- 
+ - user_repo here is user repo
+ - this 4 could be put into one collection..
+
+# repositories
+ - here is the whole repositories
+ - https://developer.github.com/v3/repos
+
 - - -
 Copyright 2014 Ospaf Lab Software, Inc. Unless otherwise marked, this work is licensed under a [Creative Commons Attribution 3.0 Unported License](http://creativecommons.org/licenses/by/3.0/).

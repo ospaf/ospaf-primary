@@ -246,14 +246,14 @@ def init_event_task():
         val = {"name": "get_events", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
         task.init("github", val)
 
-#better than 'fix_add_login'
+#easier for developing - than 'fix_add_login'
 def fix_add_created_at_int():
     db = DMDatabase().getDB()
 #2730627
     gap = 1000
-    start = 0
+    start = 3000
 # end id is now set to 10300000
-    end = 10300  
+    end = 9000  
 
     for i in range(start, end):
         res = db["user"].find({"id": {"$gte": i * gap, "$lt": (i+1)*gap}})

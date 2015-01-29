@@ -74,6 +74,10 @@ class GithubRepo:
         page_size = 30
         pages = count/30 + 1
         i = 1
+# FIXME: if the page was too big, we cannot save it since the limitation, so we can take it as special case 
+# most time, organizations will have huge repo!
+        if pages > 60:
+            pages = 60
         while i <= pages:
             ret_val = self.append_repos(user_login, i)
             if ret_val["error"] == 1:
@@ -186,12 +190,12 @@ def fix_add_count_id_created_at_int():
     for i in range(start, end):
         res = db["user"].find({"id": {"$gte": i * gap, "$lt": (i+1)*gap}})
         for item in res:
+#if it was the first run, no need to find it
             old_item = db["repos"].find_one({"login": item["login"]})
             if old_item.has_key("created_at_int") and old_item.has_key("id") and old_item.has_key("count"):
                 continue
             else:
-                old_count = len(old_item["repos"])
-                db["repos"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"], "count": old_count}})
+                db["repos"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"], "count": item["public_repos"]}})
         print i
 
 #test()

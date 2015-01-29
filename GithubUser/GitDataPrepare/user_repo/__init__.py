@@ -1,7 +1,7 @@
 import sys
 import os
 
-__all__=['event', 'user', 'user_repo', 'followers', 'repositories']
+__all__=[]
 
 dirname=sys.path[0]
 for item in __all__:
