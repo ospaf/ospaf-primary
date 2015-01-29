@@ -164,6 +164,27 @@ def init_followers_task():
         val = {"name": "get_followers", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
         task.init("github", val)
 
+def fix_add_count_id_created_at_int():
+    db = DMDatabase().getDB()
+#2730627
+    gap = 1000
+    start = 0
+# end id is now set to 10300000
+    end = 10300
+
+    for i in range(start, end):
+        res = db["user"].find({"id": {"$gte": i * gap, "$lt": (i+1)*gap}})
+        for item in res:
+            old_item = db["followers"].find_one({"login": item["login"]})
+            if old_item.has_key("created_at_int") and old_item.has_key("id") and old_item.has_key("count"):
+                continue
+            else:
+                if old_item.has_key("count"):
+                    db["repos"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"]}})
+                else:
+                    old_count = len(old_item["repos"])
+                    db["repos"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"], "count": old_count}})
+        print i
 
 def test():
     task1 = DMTask()
