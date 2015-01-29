@@ -61,6 +61,12 @@ class GithubEvent:
                 else:
                     return {"error": 1}
             if len(ret_val["val"]) > 0:
+                orig_size = len(repr(res))
+                new_size = len(repr(ret_val["val"]))
+#FIXME: gsingharoy, bad people! why will you use such a long message :)
+#DocumentTooLarge: BSON document too large (22093046 bytes) - the connected server supports BSON document sizes up to 16777216 bytes.
+                if (orig_size + new_size > 16000000):
+                    break
                 res += ret_val["val"]
                 if len(ret_val["val"]) < 30:
                     break
@@ -240,6 +246,22 @@ def init_event_task():
         val = {"name": "get_events", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
         task.init("github", val)
 
+#better than 'fix_add_login'
+def fix_add_created_at_int():
+    db = DMDatabase().getDB()
+#2730627
+    gap = 1000
+    start = 0
+# end id is now set to 10300000
+    end = 10300  
+
+    for i in range(start, end):
+        res = db["user"].find({"id": {"$gte": i * gap, "$lt": (i+1)*gap}})
+        for item in res:
+            db["event"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"]}})
+        print i
+        
+
 def fix_add_login():
     db = DMDatabase().getDB()
 #2730627
@@ -298,3 +320,5 @@ def test():
 #so far, the check_task is write..
 #check_task({"start": 3888000, "end": 3889000})
 #check_task({"start": 4512000, "end": 4513000})
+
+#fix_add_created_at_int()
