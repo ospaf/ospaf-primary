@@ -118,15 +118,14 @@ class GithubRepositories:
             else:
                 last_id = self.get_repositories_from_list(res["val"])
                 if last_id == 0:
-                    self.task.update({"status": "finish", "current": last_id, "end": last_id, "update_date": datetime.datetime.utcnow()})
                     break
                 if len(res["val"]) < 100:
 #end id == current id
-                    self.task.update({"status": "finish", "current": last_id, "end": last_id, "update_date": datetime.datetime.utcnow()})
                     break
                 else:
                     self.task.update({"current": last_id, "update_date": datetime.datetime.utcnow()})
 
+        self.task.update({"status": "finish", "current": last_id, "end": last_id, "update_date": datetime.datetime.utcnow()})
         print "Task finish, exiting the thread"
 
     def runLoopTask(self):

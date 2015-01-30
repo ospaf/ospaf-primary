@@ -13,6 +13,10 @@ from GithubUser.DMLib.DMDatabase import DMDatabase
 from GithubUser.DMLib.DMSharedUsers import DMSharedUsers
 from GithubUser.DMLib.DMTask import DMTask
 
+def date_string_to_int(date_string):
+    num = int(date_string[0:4])*10000+int(date_string[5:7])*100+int(date_string[8:10])
+    return num
+
 
 class GithubRepo:
     def __init__(self, task):
@@ -215,12 +219,17 @@ def fix_add_login_one_by_one():
                     db["repos"].remove({"login": res["login"]})
                 else:
                     print res["login"] + " updated "
-                    db["repos"].update({"login": res["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"], "count": item["public_repos"]}})
+                    created_at_int = 0
+                    if item.has_key("created_at_int"):
+                        created_at_int = item["created_at_int"]
+                    else:
+                        created_at_int = date_string_to_int(item["created_at"])
+                    db["repos"].update({"login": res["login"]}, {"$set": {"created_at_int": created_at_int, "id": item["id"], "count": item["public_repos"]}})
                 last_id = res["login"]
             else:
                 print res["login"] + "  is not found"
                 # if we get followers and not sync with user, this problem happens
-                db["followers"].remove({"login": res["login"]})
+                db["repos"].remove({"login": res["login"]})
         else:
             print 'exit'
             return
