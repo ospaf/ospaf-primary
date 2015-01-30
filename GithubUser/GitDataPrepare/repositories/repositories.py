@@ -51,7 +51,7 @@ class GithubRepositories:
             new_val[item] = val[item]
         for item in own_prop:
             new_val["owner"][item] = val["owner"][item]
-        print val
+        print "insert " + val["full_name"]
         created_at_string = val["created_at"]
         updated_at_string = val["updated_at"]
         pushed_at_string = val["pushed_at"]
@@ -146,6 +146,8 @@ class GithubRepositories:
         while last_id <= end_id:
             res = self.get_repositories_list(last_id)
             if res["error"] == 1:
+#FIXME: if error, we should continue..
+                self.task.error({"since": last_id, "message": "error in upload_repositories_event"})
                 self.task.update({"status": "finish", "current": last_id, "end": last_id, "update_date": datetime.datetime.utcnow()})
                 break
             elif len(res["val"]) == 0:

@@ -192,11 +192,40 @@ def fix_add_count_id_created_at_int():
         for item in res:
 #if it was the first run, no need to find it
             old_item = db["repos"].find_one({"login": item["login"]})
-            if old_item.has_key("created_at_int") and old_item.has_key("id") and old_item.has_key("count"):
-                continue
-            else:
-                db["repos"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"], "count": item["public_repos"]}})
+            if old_item:
+                if old_item.has_key("created_at_int") and old_item.has_key("id") and old_item.has_key("count"):
+                    continue
+                else:
+                    db["repos"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"], "count": item["public_repos"]}})
         print i
+
+def fix_add_login_one_by_one():
+    db = DMDatabase().getDB()
+#2730627
+    i = 0
+    last_id = "<null>"
+    while 1:
+        res =db["repos"].find_one({"id": {"$exists": False}})
+        if res:
+            i += 1
+            item = db["user"].find_one({"login": res["login"]})
+            if item:
+                if last_id == res["login"]:
+                    print res["login"] +" dup, removed"
+                    db["repos"].remove({"login": res["login"]})
+                else:
+                    print res["login"] + " updated "
+                    db["repos"].update({"login": res["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"], "count": item["public_repos"]}})
+                last_id = res["login"]
+            else:
+                print res["login"] + "  is not found"
+                # if we get followers and not sync with user, this problem happens
+                db["followers"].remove({"login": res["login"]})
+        else:
+            print 'exit'
+            return
+        if i%1000 == 0:
+            print i
 
 #test()
 
