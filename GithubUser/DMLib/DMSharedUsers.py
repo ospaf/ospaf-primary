@@ -74,8 +74,13 @@ class DMSharedUsers:
 # TODO timeout
         else:
             res = res_data.read()
-            val = json.loads(res)
-            return {"error": 0, "val": val}
+            if res:
+                val = json.loads(res)
+                return {"error": 0, "val": val}
+            else:
+#TODO: FIXME: why such following url has no contributors page?
+#https://api.github.com/repos/pganuysh/test/contributors?page=1
+                return {"error": 1}
 
         print "How to get here?"
         return {"error": 1}

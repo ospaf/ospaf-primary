@@ -142,10 +142,10 @@ class GithubRepositories:
             res = self.get_repositories_list(last_id)
             if res["error"] == 1:
                 self.task.error({"since": last_id, "message": "error in upload_repositories_event"})
-                self.task.update({"status": "finish", "current": last_id, "end": last_id, "update_date": datetime.datetime.utcnow()})
+                self.task.update({"status": "finish", "current": last_id, "update_date": datetime.datetime.utcnow()})
                 return
             elif len(res["val"]) == 0:
-                self.task.update({"status": "finish", "current": last_id, "end": last_id, "update_date": datetime.datetime.utcnow()})
+                self.task.update({"status": "finish", "current": last_id, "update_date": datetime.datetime.utcnow()})
                 break
             else:
                 last_id = self.get_repositories_from_list(res["val"])
@@ -157,7 +157,7 @@ class GithubRepositories:
                 else:
                     self.task.update({"current": last_id, "update_date": datetime.datetime.utcnow()})
 
-        self.task.update({"status": "finish", "current": last_id, "end": last_id, "update_date": datetime.datetime.utcnow()})
+        self.task.update({"status": "finish", "current": last_id, "update_date": datetime.datetime.utcnow()})
         print "Task finish, exiting the thread"
 
     def runLoopTask(self):
@@ -174,21 +174,22 @@ class GithubRepositories:
             print "Find unfinished task, continue to work at " + str(start_id)
 
         last_id = start_id
+        print "last id " + str(last_id) + "  end id" + str(end_id)
         while last_id <= end_id:
             res = self.get_repositories_list(last_id)
             if res["error"] == 1:
 #FIXME: if error, we should continue..
                 self.task.error({"since": last_id, "message": "error in upload_repositories_event"})
-                self.task.update({"status": "finish", "current": last_id, "end": last_id, "update_date": datetime.datetime.utcnow()})
+                self.task.update({"status": "finish", "current": last_id, "update_date": datetime.datetime.utcnow()})
                 break
             elif len(res["val"]) == 0:
-                self.task.update({"status": "finish", "current": last_id, "end": last_id, "update_date": datetime.datetime.utcnow()})
+                self.task.update({"status": "finish", "current": last_id, "update_date": datetime.datetime.utcnow()})
                 break
             else:
                 last_id = self.get_repositories_from_list(res["val"])
                 if len(res["val"]) < 100:
 #end id == current id
-                    self.task.update({"status": "finish", "current": last_id, "end": last_id, "update_date": datetime.datetime.utcnow()})
+                    self.task.update({"status": "finish", "current": last_id, "update_date": datetime.datetime.utcnow()})
                     break
                 else:
                     self.task.update({"current": last_id, "update_date": datetime.datetime.utcnow()})
@@ -239,7 +240,8 @@ def resolve_event_loop_errors():
     print str(count) + " errors solved"
 
 #most error comes from: Forbidden
-#CreamyFrothyXtasy/vendor_qcom_proprietary_common_build
+#https://help.github.com/articles/dmca-takedown-policy/
+#https://github.com/Bob-Grind/Website_Rule
 def resolve_event_errors():
     client = DMDatabase().getClient()
     res = client["task"]["github"].find({"name": "get_repositories", "error_count": {"$gte": 10}})
@@ -256,4 +258,4 @@ def resolve_event_errors():
 #updated_repositories_task()
 
 #init_repositories_task()
-resolve_event_errors()
+#resolve_event_errors()

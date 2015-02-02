@@ -13,8 +13,10 @@ from DMDatabase import DMDatabase
 #TODO client could stop the task once it cannot continue and other could do the task for the original client
 #       use ping to show the client is alive? or we add a timeout to each task record?
 
+# status: TODO, we need to add 'required' status, for example, we need to get 'repo' before we get the 'contributors'
+
+
 class DMTask:
-#TODO each  db is a connection? will it be faster to open more db in each db?
     __task_client__ = None
     __task_db__ = None
     def __init__(self):
@@ -125,6 +127,37 @@ class DMTask:
             query["status"] = "init"
         return DMTask.__task_db__[req["col"]].find(query).sort("percent", pymongo.ASCENDING).limit(req["num"])
 
+    def fixRepoTasks(self):
+        res = DMTask.__task_db__["github"].find({"status": "running", "name": "get_repositories"})
+        for item in res:
+            id = item["_id"]
+            if item.has_key("current"):
+                start = item["start"]
+                end = item["end"]
+                current = item["current"]
+                if current >= start+1000:
+#                if current >= end:
+                    print item
+                    DMTask.__task_db__["github"].update({"_id": id}, {"$set": {"status": "finish"}})
+                else:
+                    DMTask.__task_db__["github"].update({"_id": id}, {"$set": {"status": "init"}})
+            else:
+                continue
+                DMTask.__task_db__["github"].update({"_id": id}, {"$set": {"status": "init"}})
+
+        print "--------------------------------"
+        res = DMTask.__task_db__["github"].find({"status": "finish", "name": "get_repositories"})
+        for item in res:
+            if item.has_key("current"):
+                start = item["start"]
+                current = item["current"]
+#                if current < end:
+                if current < (start+1000):
+                    id = item["_id"]
+                    print item
+                    DMTask.__task_db__["github"].update({"_id": id}, {"$set": {"status": "init", "end": start+1000}})
+                    
+
 def test1():
     col = "github"
     task1 = {"name": "fake3", "action_type": "loop", "start": 1, "end": 10}
@@ -167,4 +200,8 @@ def test2():
     
     print "======== free ========"
 
-#test2()
+def test3():
+    repo_task = DMTask()
+    repo_task.fixRepoTasks()
+
+#test3()

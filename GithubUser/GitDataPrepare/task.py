@@ -21,57 +21,7 @@ from event.event import GithubEvent
 from user_repo.repo import GithubRepo
 from follower.followers import GithubFollowers
 from repositories.repositories import GithubRepositories
-
-def test1():
-    task = DMTask()
-    val = {"name": "fake-event", "action_type": "loop", "start": 10000, "end": 10001}
-
-    task.init_test("github", val)
-    e1 = GithubEvent(task)
-    e1.runTask()
-    task.remove()
-
-def test2():
-    task = DMTask()
-    val = {"name": "fake-repo", "action_type": "loop", "start": 10000, "end": 10001}
-
-    task.init_test("github", val)
-    e1 = GithubRepo(task)
-    e1.runTask()
-    task.remove()
-
-def test3():
-    task = DMTask()
-    val = {"name": "fake-followers", "action_type": "loop", "start": 10000, "end": 10001}
-
-    task.init_test("github", val)
-    e1 = GithubFollowers(task)
-    e1.runTask()
-    task.remove()
-
-def test():
-    test1()
-    test2()
-    test3()
-
-def repo(start, end):
-    gap = 1000
-    for i in range (start, end):
-        task = DMTask()
-        val = {"name": "get_repos", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
-        task.init("github", val)
-        r1 = GithubRepo(task)
-        r1.runTask()
-
-
-def followers(start, end):
-    gap = 1000
-    for i in range (start, end):
-        task = DMTask()
-        val = {"name": "get_followers", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
-        task.init("github", val)
-        r1 = GithubFollowers(task)
-        r1.runTask()
+from contributors.contributors import GithubContributors
 
 def event(start, end):
     gap = 1000
@@ -152,6 +102,10 @@ class myThread (threading.Thread):
             self.val["name"] = "get_repositories"
             self.task.init("github", self.val)
             self.r = GithubRepositories(self.task)
+        elif cmd == "get_contributors":
+            self.val["name"] = "get_contributors"
+            self.task.init("github", self.val)
+            self.r = GithubContributors(self.task)
         else:
             print "Failed to init the task"
             return 0
