@@ -87,6 +87,35 @@ class GithubRepositories:
             return 0
         return 1
 
+#return the solved errors
+    def error_check (self):
+        info = self.task.getInfo()
+        if info["status"] != "finish":
+            return 0
+
+        count = 0
+        if info.has_key("error"):
+            if info["error_count"] < 10:
+                return 0
+            update_error = []
+            list = info["error"]
+            for item in list:
+                full_name = item["full_name"]
+                id = item["id"]
+                if self.db["repositories"].find_one({"id": id}):
+                    count += 1
+                    continue
+                print "solve error for " + full_name
+                ret = self.get_repository(item)
+# error
+                if ret == 1:
+                    update_error.append({"full_name": full_name, "id": id, "message": "error even in double upload_user_event"})
+                else:
+                    count += 1
+            error_len = len(update_error)
+            self.task.update({"error": update_error, "error_count": error_len})
+        return count
+
     def runTask(self):
         info = self.task.getInfo()
         if info["action_type"] == "loop":
@@ -110,8 +139,9 @@ class GithubRepositories:
         while 1:
             res = self.get_repositories_list(last_id)
             if res["error"] == 1:
+                self.task.error({"since": last_id, "message": "error in upload_repositories_event"})
                 self.task.update({"status": "finish", "current": last_id, "end": last_id, "update_date": datetime.datetime.utcnow()})
-                break
+                return
             elif len(res["val"]) == 0:
                 self.task.update({"status": "finish", "current": last_id, "end": last_id, "update_date": datetime.datetime.utcnow()})
                 break
@@ -190,7 +220,22 @@ def updated_repositories_task():
     val = {"name": "get_repositories", "action_type": "update", "start": last_id, "end": 0}
     task.init("github", val)
 
+def resolve_event_errors():
+    gap = 1000
+    start = 0
+# end id is now set to 10300000
+    end = 29000
+    count = 0
+    for i in range (start, end):
+        task = DMTask()
+        val = {"name": "get_repositories", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
+        task.init("github", val)
+        r = GithubRepositories(task)
+        res = r.error_check()
+        count += res
+    print str(count) + " errors solved"
 
 #updated_repositories_task()
 
 #init_repositories_task()
+#resolve_event_errors()
