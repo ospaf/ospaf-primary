@@ -90,11 +90,13 @@ class GithubRepositories:
 #return the solved errors
     def error_check (self):
         info = self.task.getInfo()
+        print info
         if info["status"] != "finish":
             return 0
 
         count = 0
         if info.has_key("error"):
+#FIXME: this is just lazy way, error_count < 10 means the repo is gone, the error is not caused by our program or network..
             if info["error_count"] < 10:
                 return 0
             update_error = []
@@ -220,7 +222,8 @@ def updated_repositories_task():
     val = {"name": "get_repositories", "action_type": "update", "start": last_id, "end": 0}
     task.init("github", val)
 
-def resolve_event_errors():
+def resolve_event_loop_errors():
+    print "resolve event errors"
     gap = 1000
     start = 0
 # end id is now set to 10300000
@@ -235,7 +238,22 @@ def resolve_event_errors():
         count += res
     print str(count) + " errors solved"
 
+#most error comes from: Forbidden
+#CreamyFrothyXtasy/vendor_qcom_proprietary_common_build
+def resolve_event_errors():
+    client = DMDatabase().getClient()
+    res = client["task"]["github"].find({"name": "get_repositories", "error_count": {"$gte": 10}})
+    count = 0
+    for item in res:
+        task = DMTask()
+        val = {"name": "get_repositories", "action_type": "loop", "start": item["start"], "end": item["end"]}
+        task.init("github", val)
+        r = GithubRepositories(task)
+        res = r.error_check()
+        count += res
+    print str(count) + " errors solved"
+
 #updated_repositories_task()
 
 #init_repositories_task()
-#resolve_event_errors()
+resolve_event_errors()
