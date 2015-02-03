@@ -118,6 +118,7 @@ class GithubContributors:
         percent_gap = res_len/100
 
         for item in res_list:
+            i += 1
             self.get_repo_contributors(item["full_name"], item["id"])
 
             if percent_gap == 0:
