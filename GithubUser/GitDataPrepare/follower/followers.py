@@ -229,7 +229,6 @@ def fix_add_login_one_by_one():
 def test():
     task1 = DMTask()
     val = {"name": "fake-followers", "action_type": "loop", "start": 6001000, "end": 6005000}
-
     task1.init_test("github", val)
     e1 = GithubFollowers(task1)
     e1.runTask()
@@ -240,3 +239,11 @@ def test():
 # DONE!
 #fix_add_login_one_by_one()
 #fix_add_count_id_created_at_int()
+
+def single_download_demo():
+    task1 = DMTask()
+    val = {"name": "fake-followers", "action_type": "loop", "start": 6001000, "end": 6005000}
+    task1.init_test("github", val)
+    e1 = GithubFollowers(task1)
+    e1.upload_user_followers("002", 3269460, 2)
+

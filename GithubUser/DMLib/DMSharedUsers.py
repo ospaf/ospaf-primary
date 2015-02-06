@@ -61,7 +61,7 @@ class DMSharedUsers:
             res_data = urllib2.urlopen(req)
         except urllib2.URLError, err:
 # TODO we should note this ...
-            print 'dliang url error' + url
+            print 'dliang url error' + url + "  user  " + fu["login"]
             print err
             return {"error": 1}
         except urllib2.HTTPError, err:
