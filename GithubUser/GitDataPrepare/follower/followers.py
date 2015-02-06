@@ -194,6 +194,16 @@ def fix_add_login_one_by_one():
     i = 0
     last_id = "<null>"
     while 1:
+        res =db["followers"].find_one({"login": {"$exists": False}})
+        if res:
+            i += 1
+            db["followers"].remove({"_id": res["_id"]})
+            print str(i) + "  removed"
+        else:
+            break
+    print "login all exists"
+    i = 0
+    while 1:
         res =db["followers"].find_one({"id": {"$exists": False}})
         if res:
             i += 1
@@ -227,5 +237,6 @@ def test():
 
 #test()
 
+# DONE!
 #fix_add_login_one_by_one()
 #fix_add_count_id_created_at_int()

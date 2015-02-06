@@ -24,6 +24,7 @@ class GithubContributors:
 #List contributors : /repos/:owner/:repo/contributors
     def append_contributors(self, full_name, page):
         url = "https://api.github.com/repos/"+full_name+"/contributors?page="+str(page);
+        print url
         return DMSharedUsers().readURL(url)
 
     def get_slim(self, ret_val):
@@ -33,11 +34,11 @@ class GithubContributors:
                              "site_admin": item["site_admin"], "contributions": item["contributions"]})
         return slim_val
 
-    def get_contributors(self, user_login):
+    def get_contributors(self, full_name):
         res = []
         i = 1
         while 1:
-            ret_val = self.append_contributors(user_login, i)
+            ret_val = self.append_contributors(full_name, i)
             if ret_val["error"] == 1:
                 if i > 2:
 #   "message": "In order to keep the API fast for everyone, pagination is limited for this resource. Check the rel=last link relation in the Link response header to see how far back you can traverse.",
@@ -70,6 +71,37 @@ class GithubContributors:
             print "Error in the task"
             return 0
         return 1
+
+#return the solved errors
+    def error_check (self):
+        info = self.task.getInfo()
+        print info
+        if info["status"] == "init":
+            return 0
+
+        count = 0
+        if info.has_key("error"):
+#FIXME: this is just lazy way, error_count < 10 means the repo is gone, the error is not caused by our program or network..
+            if info["error_count"] < 10:
+                return 0
+            update_error = []
+            list = info["error"]
+            for item in list:
+                full_name = item["full_name"]
+                id = item["id"]
+                if self.db["contributors"].find_one({"id": id}):
+                    count += 1
+                    continue
+                print "solve error for " + full_name
+                ret = self.get_contributors(full_name)
+# error
+                if ret == 1:
+                    update_error.append({"full_name": full_name, "id": id, "message": "error even in double upload_user_event"})
+                else:
+                    count += 1
+            error_len = len(update_error)
+            self.task.update({"error": update_error, "error_count": error_len})
+        return count
 
     def runTask(self):
         info = self.task.getInfo()
@@ -145,6 +177,22 @@ def init_contributors_task():
         val = {"name": "get_contributors", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
         task.init("github", val)
 
+def resolve_contributors_loop_errors():
+    print "resolve contributors errors"
+    gap = 1000
+    start = 0
+    end = 29000
+    count = 0
+    for i in range (start, end):
+        task = DMTask()
+        val = {"name": "get_contributors", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
+        task.init("github", val)
+        r = GithubContributors(task)
+        res = r.error_check()
+        count += res
+    print str(count) + " errors solved"
+
+
 # unlike init_contributors_task, this is used to get new contributorss
 def updated_contributors_task():
     last_id  = get_last_saved_id()
@@ -153,3 +201,4 @@ def updated_contributors_task():
     task.init("github", val)
 
 #init_contributors_task()
+#resolve_contributors_loop_errors()
