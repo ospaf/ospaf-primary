@@ -24,7 +24,6 @@ class GithubContributors:
 #List contributors : /repos/:owner/:repo/contributors
     def append_contributors(self, full_name, page):
         url = "https://api.github.com/repos/"+full_name+"/contributors?page="+str(page);
-        print url
         return DMSharedUsers().readURL(url)
 
     def get_slim(self, ret_val):
@@ -40,6 +39,8 @@ class GithubContributors:
         while 1:
             ret_val = self.append_contributors(full_name, i)
             if ret_val["error"] == 1:
+#FIXME: I should not use i > 2 in this case, since 'contributors_count' is very important'
+#TODO: so I need to re-check the contributors_count == 30, 60, 90....
                 if i > 2:
 #   "message": "In order to keep the API fast for everyone, pagination is limited for this resource. Check the rel=last link relation in the Link response header to see how far back you can traverse.",
 #  "documentation_url": "https://developer.github.com/v3/#pagination"
