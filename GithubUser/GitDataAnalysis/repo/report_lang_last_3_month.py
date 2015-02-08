@@ -12,7 +12,7 @@ hot_langs = ["JavaScript", "Java", "Ruby", "Python", "PHP", "CSS", "C",
  "C++", "Objective-C", "C#", "Shell", "Perl", "R", "Go"]
 
 def report_lang(db):
-    res = db["research_result"].find({"type": "get_lang_count"})
+    res = db["research_result"].find({"type": "get_lang_count_last_3_month"})
     other_count = 0
     count = 0
     for item in res:
@@ -23,7 +23,7 @@ def report_lang(db):
         else:
             other_count += item["count"]
     per = 100.0 * other_count / 11545755
-    print str(other_count) + "\t" + "Other " + " (" + '%3.1f' % per + "%)"
+    print str(item["count"]) + "\t" +  "Other " + " (" + '%3.1f' % per + "%)"
     print "Total " + str(count)
 
 def main ():
