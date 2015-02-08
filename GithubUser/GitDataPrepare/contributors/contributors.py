@@ -36,17 +36,17 @@ class GithubContributors:
     def get_contributors(self, full_name):
         res = []
         i = 1
+        timeout_time = 0
         while 1:
             ret_val = self.append_contributors(full_name, i)
             if ret_val["error"] == 1:
-#FIXME: I should not use i > 2 in this case, since 'contributors_count' is very important'
-#TODO: so I need to re-check the contributors_count == 30, 60, 90....
-                if i > 2:
-#   "message": "In order to keep the API fast for everyone, pagination is limited for this resource. Check the rel=last link relation in the Link response header to see how far back you can traverse.",
-#  "documentation_url": "https://developer.github.com/v3/#pagination"
-                    return {"error": 0, "val": res}
+                timeout_time += 1
+                if (timeout_time < 10):
+                    print "timeout retry " + full_name + " " + str(i) + " " + str(timeout_time) + "times"
+                    continue
                 else:
                     return {"error": 1}
+            timeout_time = 0
             slim_val = self.get_slim(ret_val["val"])
             res += slim_val
             if len(slim_val) < 30:
@@ -58,6 +58,8 @@ class GithubContributors:
     def get_repo_contributors(self, full_name, id):
         ret_val = self.get_contributors(full_name)
         if ret_val["error"] == 1:
+#dliang: since we have lots of error, don't save it...
+            return
             self.task.error({"full_name": full_name, "id": id, "message": "error in upload_contributors_contributors"})
         else:
             count = len(ret_val["val"])
@@ -152,6 +154,9 @@ class GithubContributors:
 
         for item in res_list:
             i += 1
+            if item.has_key("contributors_count"):
+                print item["full_name"] + " already exist"
+                continue
             self.get_repo_contributors(item["full_name"], item["id"])
 
             if percent_gap == 0:

@@ -57,13 +57,20 @@ class DMSharedUsers:
         base64string = base64.encodestring('%s:%s' % (fu["login"], fu["password"])).replace('\n', '')
         req.add_header("Authorization", "Basic %s" % base64string)
 
+#TODO: where meeting this, I think I should give it 3 times!
+#<urlopen error [Errno 110] Connection timed out>
         try:
             res_data = urllib2.urlopen(req)
         except urllib2.URLError, err:
 # TODO we should note this ...
             print 'dliang url error' + url + "  user  " + fu["login"]
             print err
-            return {"error": 1}
+# FIXME: how to get Errno?
+            timeout_str = "<urlopen error [Errno 110] Connection timed out>"
+            if str(err) == timeout_str:
+                return {"error": 1, "error_code": 110}
+            else:
+                return {"error": 1}
         except urllib2.HTTPError, err:
             print '404 error'
             if err.code == 404:
