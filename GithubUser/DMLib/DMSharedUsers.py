@@ -44,6 +44,8 @@ class DMSharedUsers:
             i += 1
 
 #TODO: when do we do the refresh work?
+# This is just a current solution, we need a single demo to keep track of the account
+#   since we may have multiply process
         if DMSharedUsers.__shared_users__[max_remaining]["remaining"] < 10:
             print "Not healthy accout remained!"
 
