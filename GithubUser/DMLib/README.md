@@ -14,6 +14,8 @@
 - for client to continue working on a task
 - TODO deliver task one day
 
+# limit_check.py
+- check the status of the accounts in ~/.DMconf/account_info
 # Test
 - test_task.py - test task
 

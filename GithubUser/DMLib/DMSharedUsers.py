@@ -20,23 +20,38 @@ class DMSharedUsers:
         fo.close()
         val = json.loads(db_str)
         for item in val:
-            item["count"] = 0
-            DMSharedUsers.__shared_users__.append(item)
+            res = self.limitRemains(item)
+            if res["status"] == "OK":
+                item["remaining"] = res["core"]["remaining"]
+                item["reset"] = res["core"]["reset"]
+                DMSharedUsers.__shared_users__.append(item)
+
+#https://developer.github.com/v3/rate_limit/
+    def limitRemains(self, user):
+        url = "https://api.github.com/rate_limit"
+        res = self._readURL(url, user)
+        if res["error"] == 1:
+            return {"status": "Failed"}
+        else:
+            return {"status": "OK", "core": res["val"]["resources"]["core"]}
 
     def getFreeUser(self):
-# TODO, sync with github ..
-        min_count = 0
+        max_remaining = 0
         i = 0
         for item in DMSharedUsers.__shared_users__:
-            if (item["count"] < DMSharedUsers.__shared_users__[min_count]["count"]):
-                min_count = i
+            if (item["remaining"] > DMSharedUsers.__shared_users__[max_remaining]["remaining"]):
+                max_remaining = i
             i += 1
-        DMSharedUsers.__shared_users__[min_count]["count"] += 1
-        return DMSharedUsers.__shared_users__[min_count]
+
+#TODO: when do we do the refresh work?
+        if DMSharedUsers.__shared_users__[max_remaining]["remaining"] < 10:
+            print "Not healthy accout remained!"
+
+        DMSharedUsers.__shared_users__[max_remaining]["remaining"] -= 1
+        return DMSharedUsers.__shared_users__[max_remaining]
 
 # add and update the password
     def addFreeUser(self, login, password):
-# TODO, save to file?
         for item in DMSharedUsers.__shared_users__:
             if item["login"] == login:
                 if item["password"] == password:
@@ -54,27 +69,28 @@ class DMSharedUsers:
     def readURL(self, url):
         req = urllib2.Request(url)
         fu = DMSharedUsers().getFreeUser()
-        base64string = base64.encodestring('%s:%s' % (fu["login"], fu["password"])).replace('\n', '')
+        return self._readURL(url, fu)
+
+    def _readURL(self, url, user):
+        req = urllib2.Request(url)
+        base64string = base64.encodestring('%s:%s' % (user["login"], user["password"])).replace('\n', '')
         req.add_header("Authorization", "Basic %s" % base64string)
 
 #TODO: where meeting this, I think I should give it 3 times!
 #<urlopen error [Errno 110] Connection timed out>
         try:
             res_data = urllib2.urlopen(req)
+        except urllib2.HTTPError, err:
+            if hasattr(err, "code"):
+                return {"error": 1, "error_code": err.code}
+            else:
+# WRONG!
+                return {"error": 1}
         except urllib2.URLError, err:
-# TODO we should note this ...
-            print 'dliang url error' + url + "  user  " + fu["login"]
-            print err
-# FIXME: how to get Errno?
-            timeout_str = "<urlopen error [Errno 110] Connection timed out>"
-            if str(err) == timeout_str:
-                return {"error": 1, "error_code": 110}
+            if hasattr(err, "code"):
+                return {"error": 1, "error_code": err.code}
             else:
                 return {"error": 1}
-        except urllib2.HTTPError, err:
-            print '404 error'
-            if err.code == 404:
-                 return {"error": 1}
         except httplib.HTTPException, err:
             print 'http exception'
             return {"error": 1}

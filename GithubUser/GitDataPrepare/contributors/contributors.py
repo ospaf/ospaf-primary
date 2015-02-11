@@ -58,7 +58,7 @@ class GithubContributors:
     def get_repo_contributors(self, full_name, id):
         ret_val = self.get_contributors(full_name)
         if ret_val["error"] == 1:
-#dliang: since we have lots of error, don't save it...
+#FIXME: dliang: since we have lots of error in current enviornment, or maybe github is slow in react to this call?, don't save it...
             return
             self.task.error({"full_name": full_name, "id": id, "message": "error in upload_contributors_contributors"})
         else:
