@@ -12,9 +12,8 @@ import datetime
 
 class DMSharedUsers:
     __shared_users__ = []
-    def __init__(self):
-        if len(DMSharedUsers.__shared_users__) > 0:
-            return
+    def _load_users(self):
+        DMSharedUsers.__shared_users__ = []
         fo = open(os.path.join(os.path.expanduser('~'), ".DMconf", "account_info"), "r")
         db_str = fo.read(100000)
         fo.close()
@@ -26,6 +25,11 @@ class DMSharedUsers:
                 item["reset"] = res["core"]["reset"]
                 DMSharedUsers.__shared_users__.append(item)
 
+    def __init__(self):
+        if len(DMSharedUsers.__shared_users__) > 0:
+            return
+        self._load_users()
+
 #https://developer.github.com/v3/rate_limit/
     def limitRemains(self, user):
         url = "https://api.github.com/rate_limit"
@@ -35,19 +39,29 @@ class DMSharedUsers:
         else:
             return {"status": "OK", "core": res["val"]["resources"]["core"]}
 
-    def getFreeUser(self):
+    def _getMaxUser(self):
         max_remaining = 0
         i = 0
         for item in DMSharedUsers.__shared_users__:
             if (item["remaining"] > DMSharedUsers.__shared_users__[max_remaining]["remaining"]):
                 max_remaining = i
             i += 1
+        return max_remaining
 
-#TODO: when do we do the refresh work?
+    def getFreeUser(self):
+        max_remaining = self._getMaxUser()
+
 # This is just a current solution, we need a single demo to keep track of the account
 #   since we may have multiply process
         if DMSharedUsers.__shared_users__[max_remaining]["remaining"] < 10:
-            print "Not healthy accout remained!"
+            print "\n\n"
+            print "Not healthy accout remained! Reload the status!"
+            print "\n\n"
+            self._load_users()
+            max_remaining = self._getMaxUser()
+#TODO
+            if DMSharedUsers.__shared_users__[max_remaining]["remaining"] < 10:
+                print "Fatal error!!!"
 
         DMSharedUsers.__shared_users__[max_remaining]["remaining"] -= 1
         return DMSharedUsers.__shared_users__[max_remaining]

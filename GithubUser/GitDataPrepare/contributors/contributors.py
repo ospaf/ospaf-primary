@@ -41,7 +41,8 @@ class GithubContributors:
             ret_val = self.append_contributors(full_name, i)
             if ret_val["error"] == 1:
                 timeout_time += 1
-                if (timeout_time < 10):
+#NOTE: if we retry too many times..  the API is easily to reach the limitation
+                if (timeout_time < 3):
                     print "timeout retry " + full_name + " " + str(i) + " " + str(timeout_time) + "times"
                     continue
                 else:
