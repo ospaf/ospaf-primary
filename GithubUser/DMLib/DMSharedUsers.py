@@ -19,9 +19,14 @@ class DMSharedUsers:
         fo.close()
         val = json.loads(db_str)
         for item in val:
+            item["remaining"] = 5000
+            DMSharedUsers.__shared_users__.append(item)
+            continue
+#Don't use it now
             res = self.limitRemains(item)
             if res["status"] == "OK":
                 item["remaining"] = res["core"]["remaining"]
+                print item["remaining"]
                 item["reset"] = res["core"]["reset"]
                 DMSharedUsers.__shared_users__.append(item)
 
@@ -95,7 +100,8 @@ class DMSharedUsers:
 #TODO: where meeting this, I think I should give it 3 times!
 #<urlopen error [Errno 110] Connection timed out>
         try:
-            res_data = urllib2.urlopen(req)
+#In order to save API call, it is better to set a bigger timeout
+            res_data = urllib2.urlopen(req, timeout=60)
         except urllib2.HTTPError, err:
             if hasattr(err, "code"):
                 return {"error": 1, "error_code": err.code}
