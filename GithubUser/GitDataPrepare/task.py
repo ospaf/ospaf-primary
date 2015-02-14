@@ -167,6 +167,8 @@ def run_free_task(num, endless):
 
 #main_loop()
 def main_free_task():
+    timeout = 300
+    socket.setdefaulttimeout(timeout)
     if len(sys.argv) < 2:
         print "Please input the task you need to get"
         return

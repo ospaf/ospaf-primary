@@ -139,15 +139,19 @@ class GithubContributors:
         info = self.task.getInfo()
         start_id = info["start"]
         end_id = info["end"]
-        if info.has_key("current"):
-            start_id = info["current"]
-            print "Find unfinished task, continue to work at " + str(start_id)
+#Dliang marks this to do fix work...
+#        if info.has_key("current"):
+#            start_id = info["current"]
+#            print "Find unfinished task, continue to work at " + str(start_id)
 
         query = {"id": {"$gte": start_id, "$lt": end_id}}
 
         res = self.db["repositories"].find(query).sort("id", pymongo.ASCENDING)
         res_list = []
         for item in res:
+            if item.has_key("contributors_count"):
+                print item["full_name"] + " already exist"
+                continue
             res_list.append({"full_name": item["full_name"], "id": item["id"]})
         res_len = len(res_list)
         i = 0
@@ -155,11 +159,9 @@ class GithubContributors:
 
         for item in res_list:
             i += 1
-            if item.has_key("contributors_count"):
-                print item["full_name"] + " already exist"
-                continue
             self.get_repo_contributors(item["full_name"], item["id"])
-
+#Dliang fix memo
+            print "Fix " + item["full_name"]
             if percent_gap == 0:
                 percent = 1.0 * i / res_len
                 self.task.update({"current": item["id"], "percent": percent, "update_date": datetime.datetime.utcnow()})

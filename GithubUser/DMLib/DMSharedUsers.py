@@ -101,7 +101,8 @@ class DMSharedUsers:
 #<urlopen error [Errno 110] Connection timed out>
         try:
 #In order to save API call, it is better to set a bigger timeout
-            res_data = urllib2.urlopen(req, timeout=60)
+#TODO: 300?
+            res_data = urllib2.urlopen(req, timeout=300)
         except urllib2.HTTPError, err:
             if hasattr(err, "code"):
                 return {"error": 1, "error_code": err.code}
