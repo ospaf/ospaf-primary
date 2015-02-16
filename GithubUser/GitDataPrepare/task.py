@@ -155,7 +155,7 @@ def main_loop():
 
 def run_free_task(num, endless):
     query = {"col": "github", "num": num, "query": {"status": "init"}}
-#    query = {"col": "obs", "num": num, "query": {"status": "init"}}
+#    query = {"col": "github", "num": num, "query": {"status": "fix", "name": "get_contributors"}}
     res = DMTask().getFreeTasks(query)
     i = 0
     for item in res:
@@ -173,6 +173,7 @@ def main_free_task():
         print "Please input the task you need to get"
         return
 
+    print "Account has " + str(DMSharedUsers().getRemaining()) + " API calls"
     num = long(sys.argv[1])
     endless = 1
     run_free_task(num, endless)

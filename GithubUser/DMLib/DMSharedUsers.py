@@ -7,89 +7,25 @@ import httplib
 import urllib
 import urllib2
 import datetime
-
-#TODO try catch...
+from DMAccount import DMAccount
 
 class DMSharedUsers:
-    __shared_users__ = []
-    def _load_users(self):
-        DMSharedUsers.__shared_users__ = []
-        fo = open(os.path.join(os.path.expanduser('~'), ".DMconf", "account_info"), "r")
-        db_str = fo.read(100000)
-        fo.close()
-        val = json.loads(db_str)
-        for item in val:
-            item["remaining"] = 5000
-            DMSharedUsers.__shared_users__.append(item)
-            continue
-#Don't use it now
-            res = self.limitRemains(item)
-            if res["status"] == "OK":
-                item["remaining"] = res["core"]["remaining"]
-                print item["remaining"]
-                item["reset"] = res["core"]["reset"]
-                DMSharedUsers.__shared_users__.append(item)
+    __shared_account__ = None
 
     def __init__(self):
-        if len(DMSharedUsers.__shared_users__) > 0:
+        if DMSharedUsers.__shared_account__ is not None:
             return
-        self._load_users()
+        print "__init DMSharedUsers"
+        DMSharedUsers.__shared_account__ = DMAccount()
+        DMSharedUsers.__shared_account__.init("github")
 
-#https://developer.github.com/v3/rate_limit/
-    def limitRemains(self, user):
-        url = "https://api.github.com/rate_limit"
-        res = self._readURL(url, user)
-        if res["error"] == 1:
-            return {"status": "Failed"}
-        else:
-            return {"status": "OK", "core": res["val"]["resources"]["core"]}
-
-    def _getMaxUser(self):
-        max_remaining = 0
-        i = 0
-        for item in DMSharedUsers.__shared_users__:
-            if (item["remaining"] > DMSharedUsers.__shared_users__[max_remaining]["remaining"]):
-                max_remaining = i
-            i += 1
-        return max_remaining
-
-    def getFreeUser(self):
-        max_remaining = self._getMaxUser()
-
-# This is just a current solution, we need a single demo to keep track of the account
-#   since we may have multiply process
-        if DMSharedUsers.__shared_users__[max_remaining]["remaining"] < 10:
-            print "\n\n"
-            print "Not healthy accout remained! Reload the status!"
-            print "\n\n"
-            self._load_users()
-            max_remaining = self._getMaxUser()
-#TODO
-            if DMSharedUsers.__shared_users__[max_remaining]["remaining"] < 10:
-                print "Fatal error!!!"
-
-        DMSharedUsers.__shared_users__[max_remaining]["remaining"] -= 1
-        return DMSharedUsers.__shared_users__[max_remaining]
-
-# add and update the password
-    def addFreeUser(self, login, password):
-        for item in DMSharedUsers.__shared_users__:
-            if item["login"] == login:
-                if item["password"] == password:
-                    return
-                else:
-                    item["password"] = password
-                    return
-        DMSharedUsers.__shared_users__.append({"login": login, "password": password})
-
-#TODO connect with server will be better
-    def accountStatus(self):
-        print "AccountInfo: "
-        print DMSharedUsers.__shared_users__
+#TODO: shareduser and Account show do that individually
+    def getRemaining(self):
+        return DMSharedUsers.__shared_account__.getRemaining()
 
     def readURL(self, url):
         req = urllib2.Request(url)
-        fu = DMSharedUsers().getFreeUser()
+        fu = DMSharedUsers().__shared_account__.githubGetFreeAccount()
         return self._readURL(url, fu)
 
     def _readURL(self, url, user):
@@ -97,10 +33,7 @@ class DMSharedUsers:
         base64string = base64.encodestring('%s:%s' % (user["login"], user["password"])).replace('\n', '')
         req.add_header("Authorization", "Basic %s" % base64string)
 
-#TODO: where meeting this, I think I should give it 3 times!
-#<urlopen error [Errno 110] Connection timed out>
         try:
-#In order to save API call, it is better to set a bigger timeout
 #TODO: 300?
             res_data = urllib2.urlopen(req, timeout=300)
         except urllib2.HTTPError, err:
