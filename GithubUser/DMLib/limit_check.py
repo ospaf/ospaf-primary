@@ -1,3 +1,4 @@
+import httplib
 import sys
 import base64
 import json
@@ -9,7 +10,7 @@ import os
 def limitStatus(item):
         login = item["login"]
         password = item["password"]
-
+        print login + "\t" + password
         req = urllib2.Request("https://api.github.com/rate_limit")
         base64string = base64.encodestring('%s:%s' % (login, password)).replace('\n', '')
         req.add_header("Authorization", "Basic %s" % base64string)
@@ -38,6 +39,7 @@ def limitStatus(item):
                 val = json.loads(res)
                 return {"error": 0, "val": val}
             return {"error": 1}
+        return {"error": 1}
 
 def main():
     fo = open(os.path.join(os.path.expanduser('~'), ".DMconf", "account_info"), "r")
