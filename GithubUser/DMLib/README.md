@@ -6,6 +6,9 @@
 - Connect to our local database. Mongo in this case
 - Edit database_info.demo and Add database_info to ~/.DMconf
 
+# DMAccount.py
+- Add/Load accounts To/from DB, sync with server 
+
 # DMSharedUsers.py
 - our robot users
 - Edit account_info.demo and Add account_info to ~/.DMconf
