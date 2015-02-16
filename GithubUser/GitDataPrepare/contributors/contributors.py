@@ -64,7 +64,7 @@ class GithubContributors:
             self.task.error({"full_name": full_name, "id": id, "message": "error in upload_contributors_contributors"})
         else:
             count = len(ret_val["val"])
-            print "insert " + full_name + "with " + str(count)
+#            print "insert " + full_name + "with " + str(count)
             self.db["contributors"].insert({"full_name": full_name, "id": id, "contributors": ret_val["val"], 
                                             "count": count, "update_date": datetime.datetime.utcnow()})
             self.db["repositories"].update({"full_name": full_name, "id": id}, {"$set": {"contributors_count": count}})
@@ -130,6 +130,21 @@ class GithubContributors:
 
         last_id = start_id
 
+    def dupCheck(self, dup_list):
+        for item in dup_list:
+            res = self.db["contributors"].find({"id": item["id"]})
+            dup_con = []
+            last_id = 0
+#TODO, pop is ok..
+            for con_item in res:
+                if last_id == 0:
+                    last_id = 1
+                else:
+                    dup_con.append(con_item["_id"])
+            for con_item in dup_con:
+                print "\n------------------We find dup one!\n\n\n"
+                self.db["contributors"].remove({"_id": con_item})
+
     def runLoopTask(self):
         if self.validateTask() == 0:
             return
@@ -140,25 +155,35 @@ class GithubContributors:
         start_id = info["start"]
         end_id = info["end"]
 #Dliang marks this to do fix work...
-#        if info.has_key("current"):
-#            start_id = info["current"]
-#            print "Find unfinished task, continue to work at " + str(start_id)
+        if info.has_key("current"):
+            start_id = info["current"]
+            print "Find unfinished task, continue to work at " + str(start_id)
 
         query = {"id": {"$gte": start_id, "$lt": end_id}}
 
         res = self.db["repositories"].find(query).sort("id", pymongo.ASCENDING)
         res_list = []
+#        dup_check = []
         for item in res:
             if item.has_key("contributors_count"):
-                print item["full_name"] + " already exist"
+#                print item["full_name"] + " already exist"
+#                dup_check.append({"full_name": item["full_name"], "id": item["id"]})
                 continue
-            res_list.append({"full_name": item["full_name"], "id": item["id"]})
+            else:
+                res_list.append({"full_name": item["full_name"], "id": item["id"]})
+
+#        self.dupCheck(dup_check)
+
         res_len = len(res_list)
         i = 0
         percent_gap = res_len/100
 
         for item in res_list:
             i += 1
+#            saved_res = self.db["contributors"].find_one({"id": item["id"]})
+#            if saved_res:
+#                print "How could it possible!\n\n"
+#                continue
             self.get_repo_contributors(item["full_name"], item["id"])
 #Dliang fix memo
             print "Fix " + item["full_name"]
@@ -211,3 +236,33 @@ def updated_contributors_task():
 
 #init_contributors_task()
 #resolve_contributors_loop_errors()
+
+def resolve_dup(db, start_id, end_id):
+    query = {"id": {"$gte": start_id, "$lt": end_id}}
+    res = db["contributors"].find(query).sort("id", pymongo.ASCENDING)
+    last_id = 0
+    count = 0
+    for item in res:
+        if last_id == 0:
+            last_id = item["id"]
+        else:
+            if last_id == item["id"]:
+                count += 1
+                print "remove " + item["full_name"]
+                db["contributors"].remove({"_id": item["_id"]})
+        last_id = item["id"]
+    return count
+
+def resolve_contributors_dups():
+    gap = 1000
+    start = 0
+    end = 29000
+    count = 0
+    db = DMDatabase().getDB()
+    for i in range (start, end):
+        i_count = resolve_dup(db, i*gap, (i+1)*gap)
+        count += 0
+        print str(i_count) + "  dups in " + str(start)
+    print "total + " + str(count) + " dups"
+
+#resolve_contributors_dups()
