@@ -115,11 +115,14 @@ class DMAccount:
                 account["core"]["reset_display"] = datetime.datetime.fromtimestamp(core_ele["reset"])
 #TODO: check if account already in the queue!
                 DMAccount.__account_queue__.append(account)
+
+                account_res = DMAccount.__account_db__[col].find_one({"login": item["login"], "auth_type": item["auth_type"]})
+                if account_res:
+                    DMAccount.__account_db__[col].update({"_id": account_res["_id"]}, {"$set": {"limit": core_ele["limit"], "password": item["password"]}})
+
                 if add_to_db == False:
-#                    account_res = DMAccount.__account_db__[col].update({"login": item["login"], "password": item["password"], "auth_type": auth_type}, {"$set": {"limit": core_ele["limit"]}})
                     return
                 else:
-                    account_res = DMAccount.__account_db__[col].find_one({"login": item["login"], "auth_type": item["auth_type"]})
                     if account_res:
                         pass
                     else:
@@ -142,17 +145,13 @@ class DMAccount:
         print "Init DMAccount"
         self.col = DMAccount.__account_db__[col]
         self.__account_queue__ = []
-# add limit for debug
-#        res = self.col.find().limit(3)
-#        res = self.col.find({"auth_type":"Oauth2"})
-#        res = self.col.find({"auth_type":"Basic"}).limit(1)
         res = self.col.find()
         easy_add = 1
         for item in res:
             print "Load " + item["login"] + "  auth type " + item["auth_type"]
             if easy_add:
-                if item["auth_type"] == "Oauth2":
-                    self.easyAddUser(col, item)
+#                if item["auth_type"] == "Basic":
+                self.easyAddUser(col, item)
             else:
                 self.addUser(col, item, False)
 
