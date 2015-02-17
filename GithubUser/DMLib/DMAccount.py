@@ -90,11 +90,21 @@ class DMAccount:
             return {"error": 1}
         return {"error": 1}
 
+    def easyAddUser(self, col, item):
+        auth_type = item["auth_type"]
+        account_info = {"login": item["login"], "password": item["password"], "auth_type": auth_type, "type": col, "core": {"remaining": item["limit"]}}
+        if auth_type == "Oauth2":
+           account_info["client_id"] = item["client_id"]
+           account_info["client_secret"] = item["client_secret"]
+        
+        DMAccount.__account_queue__.append(account_info)
+
     def addUser(self, col, item, add_to_db):
         if col == "github":
             res = self.githubAccountRateLimit(col, item)
             if res["error"] == 0:
                 core_ele = res["val"]["resources"]["core"]
+                print "Remaining " + str(core_ele["remaining"]) + " Limit " + str(core_ele["limit"])
                 auth_type = "Basic"
                 if item.has_key("auth_type"):
                     auth_type = item["auth_type"]
@@ -106,13 +116,14 @@ class DMAccount:
 #TODO: check if account already in the queue!
                 DMAccount.__account_queue__.append(account)
                 if add_to_db == False:
+#                    account_res = DMAccount.__account_db__[col].update({"login": item["login"], "password": item["password"], "auth_type": auth_type}, {"$set": {"limit": core_ele["limit"]}})
                     return
                 else:
                     account_res = DMAccount.__account_db__[col].find_one({"login": item["login"], "auth_type": item["auth_type"]})
                     if account_res:
                         pass
                     else:
-                        account_info = {"login": item["login"], "password": item["password"], "auth_type": auth_type}
+                        account_info = {"login": item["login"], "password": item["password"], "auth_type": auth_type, "limit": core_ele["limit"]}
                         if auth_type == "Oauth2":
                             account_info["client_id"] = item["client_id"]
                             account_info["client_secret"] = item["client_secret"]
@@ -136,13 +147,19 @@ class DMAccount:
 #        res = self.col.find({"auth_type":"Oauth2"})
 #        res = self.col.find({"auth_type":"Basic"}).limit(1)
         res = self.col.find()
+        easy_add = 1
         for item in res:
             print "Load " + item["login"] + "  auth type " + item["auth_type"]
-            self.addUser(col, item, False)
+            if easy_add:
+                if item["auth_type"] == "Oauth2":
+                    self.easyAddUser(col, item)
+            else:
+                self.addUser(col, item, False)
 
     def getRemaining(self):
         github_remaining = 0
         for item in DMAccount.__account_queue__:
+            print item
             if item["type"] == "github":
                 github_remaining += item["core"]["remaining"]
         return github_remaining
@@ -168,8 +185,10 @@ def test3():
 #    account.loadFromFile("github", os.path.join("/home/novell", ".DMconf", "account_info_001"))
 #    account.addUser("github", {"auth_type": "Basic", "login": "suibian005", "password": "suibian0987654"}, True)
 #    account.addUser("github", {"auth_type": "Oauth2", "login": "suibian002", "password": "qwe123456", "client_id": "baa50aa1bfd7df8fba9a", "client_secret": "e1746b9f3c99326297d7e079477bd380303fada2"}, True)
-    account.loadFromFile("github", "/home/novell/ospaf-primary/GithubUser/DMLib/tmp")
-    account.getInfo()
+#    account.loadFromFile("github", "/home/novell/ospaf-primary/GithubUser/DMLib/tmp")
+    account.addUser("github", {"auth_type": "Basic", "login": "dq001", "password": "qwe123456"}, True)
+    account.addUser("github", {"auth_type": "Basic", "login": "dq002", "password": "qwe123456"}, True)
+#    account.getInfo()
 
 def test4():
     account = DMAccount()
@@ -177,3 +196,4 @@ def test4():
     account.getInfo()
 
 #test3()
+#test4()
