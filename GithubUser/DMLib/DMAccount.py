@@ -135,7 +135,7 @@ class DMAccount:
 #        res = self.col.find().limit(3)
 #        res = self.col.find({"auth_type":"Oauth2"})
 #        res = self.col.find({"auth_type":"Basic"}).limit(1)
-#        res = self.col.find()
+        res = self.col.find()
         for item in res:
             print "Load " + item["login"] + "  auth type " + item["auth_type"]
             self.addUser(col, item, False)
