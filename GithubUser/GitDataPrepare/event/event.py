@@ -21,8 +21,8 @@ class GithubEvent:
         self.db = DMDatabase().getDB()
 
     def append_event(self, gh_user_id, page):
-        url = "https://api.github.com/users/"+gh_user_id+"/events?page="+str(page);
-        return DMSharedUsers().readURL(url)
+        url = "https://api.github.com/users/"+gh_user_id+"/events"
+        return DMSharedUsers().readURL(url, {"page": page})
 
 # add a user id is better way to split the event work ..
     def upload_user_event(self, user_login, user_id):
@@ -251,7 +251,7 @@ def fix_add_created_at_int():
     db = DMDatabase().getDB()
 #2730627
     gap = 1000
-    start = 3000
+    start = 7866
 # end id is now set to 10300000
     end = 9000  
 

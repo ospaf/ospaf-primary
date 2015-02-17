@@ -33,11 +33,11 @@ class GithubRepositories:
 # "full_name": "wycats/merb-core"
         repo_name = gh_repositories_item["full_name"]
         url = "https://api.github.com/repos/"+ repo_name
-        return DMSharedUsers().readURL(url)
+        return DMSharedUsers().readURL(url, {})
 
     def get_repositories_list(self, gh_repositories_id):
-        url = "https://api.github.com/repositories?since="+`gh_repositories_id`+"&page_size=100";
-        return DMSharedUsers().readURL(url)
+        url = "https://api.github.com/repositories";
+        return DMSharedUsers().readURL(url, {"since": gh_repositories_id, "page_size": 100})
 
     def insert_data(self, val):
         key_prop = ["id", "name", "full_name", "private", "description", "fork", "created_at", "updated_at", "pushed_at",

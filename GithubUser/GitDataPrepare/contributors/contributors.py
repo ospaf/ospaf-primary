@@ -23,8 +23,8 @@ class GithubContributors:
 #GET /repos/:owner/:repo
 #List contributors : /repos/:owner/:repo/contributors
     def append_contributors(self, full_name, page):
-        url = "https://api.github.com/repos/"+full_name+"/contributors?page="+str(page);
-        return DMSharedUsers().readURL(url)
+        url = "https://api.github.com/repos/"+full_name+"/contributors";
+        return DMSharedUsers().readURL(url, {"page": page})
 
     def get_slim(self, ret_val):
         slim_val = []
@@ -64,7 +64,7 @@ class GithubContributors:
             self.task.error({"full_name": full_name, "id": id, "message": "error in upload_contributors_contributors"})
         else:
             count = len(ret_val["val"])
-#            print "insert " + full_name + "with " + str(count)
+            print "insert " + full_name + "with " + str(count)
             self.db["contributors"].insert({"full_name": full_name, "id": id, "contributors": ret_val["val"], 
                                             "count": count, "update_date": datetime.datetime.utcnow()})
             self.db["repositories"].update({"full_name": full_name, "id": id}, {"$set": {"contributors_count": count}})
@@ -186,7 +186,6 @@ class GithubContributors:
 #                continue
             self.get_repo_contributors(item["full_name"], item["id"])
 #Dliang fix memo
-            print "Fix " + item["full_name"]
             if percent_gap == 0:
                 percent = 1.0 * i / res_len
                 self.task.update({"current": item["id"], "percent": percent, "update_date": datetime.datetime.utcnow()})

@@ -19,9 +19,9 @@ class GithubEventNoDB:
         self.status = 1
 
     def append_event(self, gh_user_id, page):
-        url = "https://api.github.com/users/"+gh_user_id+"/events?page="+str(page);
+        url = "https://api.github.com/users/"+gh_user_id+"/events";
         print url
-        return DMSharedUsers().readURL(url)
+        return DMSharedUsers().readURL(url, {"page": page})
 
     def upload_user_event(self, user_login):
         need_update = 0

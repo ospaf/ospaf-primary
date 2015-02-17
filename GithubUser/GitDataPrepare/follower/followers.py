@@ -20,8 +20,8 @@ class GithubFollowers:
         self.db = DMDatabase().getDB()
 
     def append_followers(self, gh_user_id, page):
-        url = "https://api.github.com/users/"+gh_user_id+"/followers?page="+str(page);
-        return DMSharedUsers().readURL(url)
+        url = "https://api.github.com/users/"+gh_user_id+"/followers"
+        return DMSharedUsers().readURL(url, {"page": page})
 
     def upload_user_followers(self, user_login, user_id, user_count):
         need_update = 1

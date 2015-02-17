@@ -24,8 +24,8 @@ class GithubRepo:
         self.db = DMDatabase().getDB()
 
     def append_repos(self, gh_user_id, page):
-        url = "https://api.github.com/users/"+gh_user_id+"/repos?page="+str(page);
-        return DMSharedUsers().readURL(url)
+        url = "https://api.github.com/users/"+gh_user_id+"/repos";
+        return DMSharedUsers().readURL(url, {"page": page})
 
     def upload_user_repos(self, user_login, user_id, user_count):
         need_update = 1

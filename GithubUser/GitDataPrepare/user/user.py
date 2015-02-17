@@ -26,12 +26,12 @@ class GithubUser:
     def get_user(self, gh_user_login):
         url = "https://api.github.com/users/"+gh_user_login
         print gh_user_login
-        return DMSharedUsers().readURL(url)
+        return DMSharedUsers().readURL(url, {})
 
     def get_user_list(self, gh_user_id):
-        url = "https://api.github.com/users?since="+`gh_user_id`+"&page_size=100";
+        url = "https://api.github.com/users";
         print url
-        return DMSharedUsers().readURL(url)
+        return DMSharedUsers().readURL(url, {"since": gh_user_id, "page_size":100})
 
     def get_user_from_list(self, user_list):
         last_id = 0
