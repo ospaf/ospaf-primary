@@ -108,15 +108,22 @@ class DMAccount:
                 auth_type = "Basic"
                 if item.has_key("auth_type"):
                     auth_type = item["auth_type"]
-                account = {"auth_type": auth_type, "login": item["login"], "password": item["password"], "type": col, "core": core_ele}
+                account = {"auth_type": auth_type, "login": item["login"]}
                 if auth_type == "Oauth2":
                     account["client_id"] = item["client_id"]
                     account["client_secret"] = item["client_secret"]
+#login, type, client_id/client_secret should be uniq!
+#An account could have lots of apps..               
+                print account
+                account_res = DMAccount.__account_db__[col].find_one(account)
+#password, core info and reset_display might changes..
+                account["password"] = item["password"]
+                account["type"] = col
+                account["core"] = core_ele
                 account["core"]["reset_display"] = datetime.datetime.fromtimestamp(core_ele["reset"])
 #TODO: check if account already in the queue!
                 DMAccount.__account_queue__.append(account)
 
-                account_res = DMAccount.__account_db__[col].find_one({"login": item["login"], "auth_type": item["auth_type"]})
                 if account_res:
                     DMAccount.__account_db__[col].update({"_id": account_res["_id"]}, {"$set": {"limit": core_ele["limit"], "password": item["password"]}})
 
@@ -131,7 +138,6 @@ class DMAccount:
                             account_info["client_id"] = item["client_id"]
                             account_info["client_secret"] = item["client_secret"]
                         account_res = DMAccount.__account_db__[col].insert(account_info)
-
 
     def loadFromFile(self, col, url):
         fo = open(url, "r")
@@ -150,8 +156,8 @@ class DMAccount:
         for item in res:
             print "Load " + item["login"] + "  auth type " + item["auth_type"]
             if easy_add:
-#                if item["auth_type"] == "Basic":
-                self.easyAddUser(col, item)
+                if item["auth_type"] == "Basic":
+                    self.easyAddUser(col, item)
             else:
                 self.addUser(col, item, False)
 
@@ -178,13 +184,16 @@ class DMAccount:
     def removeUser (self, col, item):
          pass
 
+def test2():
+    account = DMAccount()
+    account.loadFromFile("github", "/home/novell/ospaf-primary/GithubUser/DMLib/tmp")
+
 def test3():
     account = DMAccount()
 #    account.loadFromFile("github", os.path.join(os.path.expanduser('~'), ".DMconf", "account_info"))
 #    account.loadFromFile("github", os.path.join("/home/novell", ".DMconf", "account_info_001"))
 #    account.addUser("github", {"auth_type": "Basic", "login": "suibian005", "password": "suibian0987654"}, True)
 #    account.addUser("github", {"auth_type": "Oauth2", "login": "suibian002", "password": "qwe123456", "client_id": "baa50aa1bfd7df8fba9a", "client_secret": "e1746b9f3c99326297d7e079477bd380303fada2"}, True)
-#    account.loadFromFile("github", "/home/novell/ospaf-primary/GithubUser/DMLib/tmp")
     account.addUser("github", {"auth_type": "Basic", "login": "dq001", "password": "qwe123456"}, True)
     account.addUser("github", {"auth_type": "Basic", "login": "dq002", "password": "qwe123456"}, True)
 #    account.getInfo()
@@ -194,5 +203,6 @@ def test4():
     account.init("github")
     account.getInfo()
 
+#test2()
 #test3()
 #test4()
