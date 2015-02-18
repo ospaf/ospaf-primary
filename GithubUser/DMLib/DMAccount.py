@@ -155,14 +155,14 @@ class DMAccount:
         self.col = DMAccount.__account_db__[col]
         self.__account_queue__ = []
         res = self.col.find()
-        easy_add = 1
+        easy_add = 0
         for item in res:
             # support this two types now.
-            if item["auth_type"] != "Basic" or item["auth_type"] != "Oauth2":
+            if item["auth_type"] != "Basic" and item["auth_type"] != "Oauth2":
                 continue
             print "Load " + item["login"] + "  auth type " + item["auth_type"]
             if easy_add:
-                if item["auth_type"] == "Oauth2" and item["login"] == "githublover003":
+                if item["auth_type"] == "Oauth2":
                     self.easyAddUser(col, item)
             else:
                 self.addUser(col, item, False)
