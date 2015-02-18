@@ -59,6 +59,9 @@ class DMAccount:
             req.add_header("Authorization", "Basic %s" % base64string)
         elif auth_type == "Oauth2":
             req = urllib2.Request("https://api.github.com/rate_limit?client_id=" + item["client_id"] + "&client_secret=" + item["client_secret"])
+            #Oauth with Basic seems better!
+            base64string = base64.encodestring('%s:%s' % (login, password)).replace('\n', '')
+            req.add_header("Authorization", "Basic %s" % base64string)
         else:
             print "Unsupported user auth type " + auth_type
             return {"error": 1}
@@ -152,7 +155,7 @@ class DMAccount:
         self.col = DMAccount.__account_db__[col]
         self.__account_queue__ = []
         res = self.col.find()
-        easy_add = 1
+        easy_add = 0
         for item in res:
             print "Load " + item["login"] + "  auth type " + item["auth_type"]
             if easy_add:
@@ -205,4 +208,4 @@ def test4():
 
 #test2()
 #test3()
-#test4()
+test4()

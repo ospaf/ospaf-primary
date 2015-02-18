@@ -45,6 +45,8 @@ class DMSharedUsers:
             params["client_secret"] = user["client_secret"]
             data=urllib.urlencode(params)
             req = urllib2.Request(url+"?"+data)
+            base64string = base64.encodestring('%s:%s' % (user["login"], user["password"])).replace('\n', '')
+            req.add_header("Authorization", "Basic %s" % base64string)
         else:
             print "fatal user error!"
             return {"error": 1}
