@@ -121,6 +121,7 @@ class DMAccount:
 #password, core info and reset_display might changes..
                 account["password"] = item["password"]
                 account["type"] = col
+                account["core"] = core_ele
                 account["core"]["reset_display"] = datetime.datetime.fromtimestamp(core_ele["reset"])
 #TODO: check if account already in the queue!
                 DMAccount.__account_queue__.append(account)
