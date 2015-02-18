@@ -79,7 +79,6 @@ class DMAccount:
             elif hasattr(err, 'code'):
                 print err.code
             print 'dliang url error' + "  user  " + login
-            print err.read()
             return {"error": 1, "error_code": 110}
         except httplib.HTTPException, err:
             print 'http exception'
@@ -122,7 +121,6 @@ class DMAccount:
 #password, core info and reset_display might changes..
                 account["password"] = item["password"]
                 account["type"] = col
-                account["core"] = core_ele
                 account["core"]["reset_display"] = datetime.datetime.fromtimestamp(core_ele["reset"])
 #TODO: check if account already in the queue!
                 DMAccount.__account_queue__.append(account)
@@ -155,7 +153,7 @@ class DMAccount:
         self.col = DMAccount.__account_db__[col]
         self.__account_queue__ = []
         res = self.col.find()
-        easy_add = 0
+        easy_add = 1
         for item in res:
             # support this two types now.
             if item["auth_type"] != "Basic" and item["auth_type"] != "Oauth2":
