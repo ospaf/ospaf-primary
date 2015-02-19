@@ -180,17 +180,17 @@ def addOneUser(db, gh_user_login):
         updated_at_int = date_string_to_int(updated_at_string)
         val["created_at_int"] = created_at_int
         val["updated_at_int"] = updated_at_int
-        if self.db["user"].find_one({"login": item["login"]}):
-            self.db["user"].update({"login": item["login"]}, {"$set": val})
+        if db["user"].find_one({"login": gh_user_login}):
+            db["user"].update({"login": gh_user_login}, {"$set": val})
         else:
-            self.db["user"].insert(val)
+            db["user"].insert(val)
 #updated_user_task()
 
 def test():
     dm_db = DMDatabase()
     db = dm_db.getDB()
-    login = ""
+    login = "tqtran7"
     if (db):
         addOneUser(db, login)
 
-#test()
+test()
