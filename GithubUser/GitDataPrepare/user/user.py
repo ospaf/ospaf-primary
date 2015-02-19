@@ -166,5 +166,31 @@ def updated_user_task():
     task.init("github", val)
 
 
+def addOneUser(db, gh_user_login):
+    url = "https://api.github.com/users/"+gh_user_login
+    ret_val = DMSharedUsers().readURL(url, {})
+    if ret_val["error"] == 1:
+        return
+    else:
+        val = ret_val["val"]
+        val["update_date"] = datetime.datetime.utcnow()
+        created_at_string = val["created_at"]
+        updated_at_string = val["updated_at"]
+        created_at_int = date_string_to_int(created_at_string)
+        updated_at_int = date_string_to_int(updated_at_string)
+        val["created_at_int"] = created_at_int
+        val["updated_at_int"] = updated_at_int
+        if self.db["user"].find_one({"login": item["login"]}):
+            self.db["user"].update({"login": item["login"]}, {"$set": val})
+        else:
+            self.db["user"].insert(val)
 #updated_user_task()
 
+def test():
+    dm_db = DMDatabase()
+    db = dm_db.getDB()
+    login = ""
+    if (db):
+        addOneUser(db, login)
+
+#test()
