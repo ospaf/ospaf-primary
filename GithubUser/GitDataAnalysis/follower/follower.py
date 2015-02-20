@@ -69,6 +69,7 @@ def get_follower (db, login):
 
     if res:
         return res["followers"]
+    else:
         print "Cannot get followers of " + login
         return []
 
@@ -119,7 +120,7 @@ def main ():
     if (client):
         login = "initlove"
         init_beginer(login)
-        for level in range (0, 5):
+        for level in range (0, 10):
             if get_followers(client, db, level) == 0:
                 break
     else:
