@@ -10,6 +10,8 @@ from pymongo import MongoClient
 from GithubUser.DMLib.DMDatabase import DMDatabase
 from GithubUser.DMLib.DMSharedUsers import DMSharedUsers
 
+import followers
+
 def date_string_to_int(date_string):
     num = int(date_string[0:4])*10000+int(date_string[5:7])*100+int(date_string[8:10])
     return num
@@ -33,8 +35,17 @@ def addOneUser(db, gh_user_login):
         else:
             db["user"].insert(val)
 
-whole_followers = ["initlove"]
-social = [{"level": 0, "logins": ["initlove"]}]
+beginner = None
+whole_followers = []
+social = []
+
+def init_beginer(login):
+    global beginner
+    global whole_followers
+    global social
+    beginner = login
+    whole_followers.append(login)
+    social.append({"level": 0, "logins": [login]})
 
 def add_to_whole_list(login):
     for item in whole_followers:
@@ -44,31 +55,58 @@ def add_to_whole_list(login):
     return 1
 
 def get_follower (db, login):
-    res = db.followers.find_one("login": login)
+    res = db.followers.find_one({"login": login})
+    if res is None:
+        user = db.user.find_one({"login": login})
+        if user is None:
+            print "User " + login + " even not exist, added"
+            addOneUser(db, login)
+            user = db.user.find_one({"login": login})
+        if user and user["followers"]>0:    
+            print "followers " + login + " even not exist, added"
+            followers.single_download_demo(user["login"], user["id"], user["followers"])
+            res = db.followers.find_one({"login": login})
+
     if res:
         return res["followers"]
-    else:
-        print "Cannot get followers of " login
+        print "Cannot get followers of " + login
         return []
 
-def get_followers(db, level):
+def get_followers(client, db, level):
+    global beginner
+    global whole_followers
+    global social
+    res = client["followers_research"][beginner].find_one({"level": level+1})
+    if res:
+        for follower in res["logins"]:
+            add_to_whole_list(follower["login"])
+        print "Already in db, " + str(len(res["logins"])) + "  counts"
+        social.append({"level": level+1, "logins": res["logins"]})
+        return
+
     new_logins = []
+    already_count = 0
     for item in social:
         if item["level"] == level:
             logins = item["logins"]
             for login in logins:
                 followers = get_follower(db, login)
+                #if null, means he/she has no followers..
                 for follower in followers:
                     val = add_to_whole_list(follower["login"])
                     # 0 means already exist
                     if val == 0:
+                        already_count += 1
+                        pass
                     else:
-                        new_logins.append(follower)
+                        new_logins.append(follower["login"])
         else:
             pass
     count = len(new_logins)
-    print str(count) + "  new logins added in " + len(level)
+    print str(count) + "  new logins added in " + str(level) + "  already added " + str(already_count)
     social.append({"level": level+1, "logins": new_logins})
+
+    client["followers_research"][beginner].insert({"level": level+1, "logins": new_logins})
     if count > 0:
         return 1
     else:
@@ -79,11 +117,10 @@ def main ():
     client = dm_db.getClient()
     db = dm_db.getDB()
     if (client):
-#user name is a database
-#repo_name is col to store repos that
-#user is another col to store contributors' info
+        login = "initlove"
+        init_beginer(login)
         for level in range (0, 5):
-            if get_followers(db, level) == 0:
+            if get_followers(client, db, level) == 0:
                 break
     else:
         print "Cannot connect to database"
