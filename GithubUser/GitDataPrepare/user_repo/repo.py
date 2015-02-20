@@ -29,7 +29,7 @@ class GithubRepo:
 
     def upload_user_repos(self, user_login, user_id, user_count):
         need_update = 1
-        old_res = self.db["repos"].find_one({"login": user_login})
+        old_res = self.db["user_repos"].find_one({"login": user_login})
         if old_res:
             if old_res.has_key("count"):
                 old_res_len = old_res["count"]
@@ -41,7 +41,7 @@ class GithubRepo:
                 if (old_res_len > 0) and (user_count <= old_res_len):
                     print "saved, but need to update - add count prop"
                     val = {"$set": {"count": old_res_len}}
-                    self.db["repos"].update({"login":user_login}, val)
+                    self.db["user_repos"].update({"login":user_login}, val)
                     return 0
         else:
             need_update = 0
@@ -60,13 +60,13 @@ class GithubRepo:
                    "count": new_res_count,
                    "update_date": datetime.datetime.utcnow()
                   }
-            self.db["repos"].insert(val)
+            self.db["user_repos"].insert(val)
             print "insert " + user_login + "new count " + str(new_res_count) + " whole " + str(user_count)
         else:
             val = {"$set": {"update_date": datetime.datetime.utcnow(),
                             "count": new_res_count,
                             "repos": new_res["val"]}}
-            self.db["repos"].update({"login":user_login}, val)
+            self.db["user_repos"].update({"login":user_login}, val)
             print "update " + user_login + "new count " + str(new_res_count) + " whole " + str(user_count)
         return 0
 
@@ -195,13 +195,23 @@ def fix_add_count_id_created_at_int():
         res = db["user"].find({"id": {"$gte": i * gap, "$lt": (i+1)*gap}})
         for item in res:
 #if it was the first run, no need to find it
-            old_item = db["repos"].find_one({"login": item["login"]})
+            old_item = db["user_repos"].find_one({"login": item["login"]})
             if old_item:
                 if old_item.has_key("created_at_int") and old_item.has_key("id") and old_item.has_key("count"):
                     continue
                 else:
-                    db["repos"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"], "count": item["public_repos"]}})
+                    db["user_repos"].update({"login": item["login"]}, {"$set": {"created_at_int": item["created_at_int"], "id": item["id"], "count": item["public_repos"]}})
         print i
+
+#this is a easy way to add a user_repos
+def add_one():
+    e1 = GithubRepo({})
+    user_login = "tangqiwen"
+    user_id = 4090768
+    user_count = 32
+    e1.upload_user_repos(user_login, user_id, user_count)
+
+#add_one()
 
 def fix_add_login_one_by_one():
     db = DMDatabase().getDB()
@@ -209,14 +219,14 @@ def fix_add_login_one_by_one():
     i = 0
     last_id = "<null>"
     while 1:
-        res =db["repos"].find_one({"id": {"$exists": False}})
+        res =db["user_repos"].find_one({"id": {"$exists": False}})
         if res:
             i += 1
             item = db["user"].find_one({"login": res["login"]})
             if item:
                 if last_id == res["login"]:
                     print res["login"] +" dup, removed"
-                    db["repos"].remove({"login": res["login"]})
+                    db["user_repos"].remove({"login": res["login"]})
                 else:
                     print res["login"] + " updated "
                     created_at_int = 0
@@ -224,12 +234,12 @@ def fix_add_login_one_by_one():
                         created_at_int = item["created_at_int"]
                     else:
                         created_at_int = date_string_to_int(item["created_at"])
-                    db["repos"].update({"login": res["login"]}, {"$set": {"created_at_int": created_at_int, "id": item["id"], "count": item["public_repos"]}})
+                    db["user_repos"].update({"login": res["login"]}, {"$set": {"created_at_int": created_at_int, "id": item["id"], "count": item["public_repos"]}})
                 last_id = res["login"]
             else:
                 print res["login"] + "  is not found"
                 # if we get followers and not sync with user, this problem happens
-                db["repos"].remove({"login": res["login"]})
+                db["user_repos"].remove({"login": res["login"]})
         else:
             print 'exit'
             return
