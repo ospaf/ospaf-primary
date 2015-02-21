@@ -36,23 +36,31 @@ def addOneUser(db, gh_user_login):
             db["user"].insert(val)
 
 beginner = None
-whole_followers = []
-social = []
 
-def init_beginer(login):
+def init_beginer(client, login, level):
     global beginner
-    global whole_followers
-    global social
     beginner = login
-    whole_followers.append(login)
-    social.append({"level": 0, "logins": [login]})
 
-def add_to_whole_list(login):
-    for item in whole_followers:
-        if item == login:
-            return 0
-    whole_followers.append(login)
-    return 1
+    add_to_whole_list(client, login, level)
+    add_to_social_level(client, {"level": level, "logins": [login]})
+
+def add_to_social_level(client, item):
+    global beginner
+    beginner_meta = beginner + "_meta"
+    res = client["followers_research"][beginner_meta].find_one({"level": item["level"]})
+    if res:
+        return 0
+    else:
+        client["followers_research"][beginner_meta].insert(item)
+
+def add_to_whole_list(client, login, level):
+    global beginner
+    res = client["followers_research"][beginner].find_one({"login": login})
+    if res:
+        return 0
+    else:
+        client["followers_research"][beginner].insert({"login": login, "level": level})
+        return 1
 
 def get_follower (db, login):
     res = db.followers.find_one({"login": login})
@@ -75,40 +83,33 @@ def get_follower (db, login):
 
 def get_followers(client, db, level):
     global beginner
-    global whole_followers
-    global social
-    res = client["followers_research"][beginner].find_one({"level": level+1})
-    if res:
-        for follower in res["logins"]:
-            add_to_whole_list(follower["login"])
-        print "Already in db, " + str(len(res["logins"])) + "  counts"
-        social.append({"level": level+1, "logins": res["logins"]})
-        return
 
-    new_logins = []
+    #to continue to do the search work.
+    beginner_meta = beginner + "_meta"
+    res = client["followers_research"][beginner_meta].find_one({"level": item["level"]})
+    if res:
+        return 1
+
     already_count = 0
-    for item in social:
-        if item["level"] == level:
-            logins = item["logins"]
-            for login in logins:
-                followers = get_follower(db, login)
-                #if null, means he/she has no followers..
-                for follower in followers:
-                    val = add_to_whole_list(follower["login"])
-                    # 0 means already exist
-                    if val == 0:
-                        already_count += 1
-                        pass
-                    else:
-                        new_logins.append(follower["login"])
+    new_count = 0
+    res = client["followers_research"][beginner].find({"level": level})
+    for item in res:
+        followers = get_follower(db, item["login"])
+        #if null, means he/she has no followers..
+        for follower in followers:
+            val = add_to_whole_list(client, follower["login"], level+1)
+            # 0 means already exist
+            if val == 0:
+                already_count += 1
+                pass
+            else:
+                new_count += 1
         else:
             pass
-    count = len(new_logins)
-    print str(count) + "  new logins added in " + str(level) + "  already added " + str(already_count)
-    social.append({"level": level+1, "logins": new_logins})
+    print str(new_count) + "  new logins added in " + str(level+1) + "  already added " + str(already_count)
+    add_to_social_level(client, {"level": level+1, "already_count": already_count, "new_count": new_count})
 
-    client["followers_research"][beginner].insert({"level": level+1, "logins": new_logins})
-    if count > 0:
+    if new_count > 0:
         return 1
     else:
         return 0
@@ -119,9 +120,10 @@ def main ():
     db = dm_db.getDB()
     if (client):
         login = "initlove"
-        init_beginer(login)
+        init_beginer(client, login, 0)
         for level in range (0, 10):
             if get_followers(client, db, level) == 0:
+                print "No more, exit"
                 break
     else:
         print "Cannot connect to database"
