@@ -57,10 +57,15 @@ def add_to_whole_list(client, login, level):
     global beginner
     res = client["followers_research"][beginner].find_one({"login": login})
     if res:
-        return 0
+        if res["level"] < level:
+        #already added
+            return 1
+        else:
+        #just continue to do the loop
+            return 2
     else:
         client["followers_research"][beginner].insert({"login": login, "level": level})
-        return 1
+        return 0
 
 def get_follower (db, login):
     res = db.followers.find_one({"login": login})
@@ -83,31 +88,30 @@ def get_follower (db, login):
 
 def get_followers(client, db, level):
     global beginner
-
+   
     #to continue to do the search work.
     beginner_meta = beginner + "_meta"
-    res = client["followers_research"][beginner_meta].find_one({"level": item["level"]})
+    res = client["followers_research"][beginner_meta].find_one({"level": level})
     if res:
         return 1
-
+    print "Start to get level: " + str(level)
     already_count = 0
     new_count = 0
-    res = client["followers_research"][beginner].find({"level": level})
+    res = client["followers_research"][beginner].find({"level": level-1})
     for item in res:
         followers = get_follower(db, item["login"])
         #if null, means he/she has no followers..
         for follower in followers:
-            val = add_to_whole_list(client, follower["login"], level+1)
+            val = add_to_whole_list(client, follower["login"], level)
             # 0 means already exist
             if val == 0:
-                already_count += 1
-                pass
-            else:
                 new_count += 1
-        else:
-            pass
-    print str(new_count) + "  new logins added in " + str(level+1) + "  already added " + str(already_count)
-    add_to_social_level(client, {"level": level+1, "already_count": already_count, "new_count": new_count})
+            elif val == 1:
+                already_count += 1
+            else:
+                pass
+    print str(new_count) + "  new logins added in " + str(level) + "  already added " + str(already_count)
+    add_to_social_level(client, {"level": level, "already_count": already_count, "new_count": new_count})
 
     if new_count > 0:
         return 1
@@ -121,7 +125,7 @@ def main ():
     if (client):
         login = "initlove"
         init_beginer(client, login, 0)
-        for level in range (0, 10):
+        for level in range (1, 10):
             if get_followers(client, db, level) == 0:
                 print "No more, exit"
                 break
