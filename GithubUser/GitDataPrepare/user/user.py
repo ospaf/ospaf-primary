@@ -30,13 +30,12 @@ class GithubUser:
 
     def get_user_list(self, gh_user_id):
         url = "https://api.github.com/users";
-        print url
         return DMSharedUsers().readURL(url, {"since": gh_user_id, "page_size":100})
 
     def get_user_from_list(self, user_list):
         last_id = 0
         for item in user_list:
-            ret_val = self.get_user(self, item["login"])
+            ret_val = self.get_user(item["login"])
             last_id = item["id"]
             if ret_val["error"] == 1:
                 self.task.error({"login": item["login"], "id": item["id"], "message": "error in upload_user_event"})
@@ -145,6 +144,9 @@ def init_user_task():
     start = 0
 # end id is now set to 10300000
     end = 10300
+#initlove: new id added
+    start = 10300
+    end = 11030
     db = DMDatabase().getDB()
     for i in range (start, end):
         task = DMTask()
@@ -189,8 +191,8 @@ def addOneUser(db, gh_user_login):
 def test():
     dm_db = DMDatabase()
     db = dm_db.getDB()
-    login = "tqtran7"
+    login = "divius"
     if (db):
         addOneUser(db, login)
 
-test()
+#init_user_task()

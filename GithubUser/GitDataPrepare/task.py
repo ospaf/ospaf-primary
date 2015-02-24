@@ -22,6 +22,7 @@ from user_repo.repo import GithubRepo
 from follower.followers import GithubFollowers
 from repositories.repositories import GithubRepositories
 from contributors.contributors import GithubContributors
+from user.user import GithubUser
 
 def event(start, end):
     gap = 1000
@@ -94,10 +95,10 @@ class myThread (threading.Thread):
             self.task.init("github", self.val)
             self.r = GithubEvent(self.task)
 # TODO: do not support now
-#        elif cmd == "get_users":
-#            self.val["name"] = "get_users"
-#            self.task.init("github", self.val)
-#            self.r = GithubUser(self.task)
+        elif cmd == "get_users":
+            self.val["name"] = "get_users"
+            self.task.init("github", self.val)
+            self.r = GithubUser(self.task)
         elif cmd == "get_repositories":
             self.val["name"] = "get_repositories"
             self.task.init("github", self.val)
@@ -114,17 +115,20 @@ class myThread (threading.Thread):
     def run(self):
         print "Starting " + str(self.val)
         if self.r:
+#            self.r.runFixTask()
             self.r.runTask()
         print "Exiting " + str(self.val)
 
         if self.endless == 1:
             while 1:
                 query = {"col": "github", "num": 1, "query": {"status": "init"}}
+#                query = {"col": "github", "num": 1, "query": {"status": "finish", "name": "get_contributors"}}
                 res = DMTask().getFreeTasks(query)
                 if res:
                     for item in res:
                         print item
                         if self.set(item["name"], item["start"], item["end"]) == 1:
+#                            self.r.runFixTask()
                             self.r.runTask()
                         else:
                             return
@@ -155,7 +159,7 @@ def main_loop():
 
 def run_free_task(num, endless):
     query = {"col": "github", "num": num, "query": {"status": "init"}}
-#    query = {"col": "github", "num": num, "query": {"status": "fix", "name": "get_contributors"}}
+#    query = {"col": "github", "num": num, "query": {"status": "finish", "name": "get_contributors"}}
     res = DMTask().getFreeTasks(query)
     i = 0
     for item in res:
