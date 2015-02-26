@@ -54,7 +54,11 @@ def get_commit_repos_by_user(db, user):
         date_list = get_date_list()
         repo_list = res["repo_list"]
         for repo in repo_list:
+           #if the repo is already added, no need to re-generate that 
+           if db["commit_check_meta_result"].find_one({"full_name": repo["full_name"]}):
+               continue
            get_commits(db, repo["full_name"], date_list)
+           db["commit_check_meta_result"].insert({"full_name": repo["full_name"]})
 
 def main():
     timeout = 300
