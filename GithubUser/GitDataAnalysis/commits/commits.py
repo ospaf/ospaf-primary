@@ -60,7 +60,23 @@ def get_commit_repos_by_user(db, user):
            get_commits(db, repo["full_name"], date_list)
            db["commit_check_meta_result"].insert({"full_name": repo["full_name"]})
 
-def main():
+def get_commit_repos_by_query(db, query):
+    res =db["user_contributor_result2"].find(query)
+    date_list = get_date_list()
+    i = 0
+    for item in res:
+        i += 1
+        print i
+        repo_list = item["repo_list"]
+        for repo in repo_list:
+           #if the repo is already added, no need to re-generate that 
+           if db["commit_check_meta_result"].find_one({"full_name": repo["full_name"]}):
+               continue
+           get_commits(db, repo["full_name"], date_list)
+           db["commit_check_meta_result"].insert({"full_name": repo["full_name"]})
+        
+
+def main(type):
     timeout = 300
     socket.setdefaulttimeout(timeout)
 
@@ -68,7 +84,12 @@ def main():
 
     db = DMDatabase().getDB()
     if db:
-        user = "torvalds"
-        get_commit_repos_by_user(db, user)
+        if type == "user":
+            user = "torvalds"
+            get_commit_repos_by_user(db, user)
+        elif type == "query":
+            query = {"contributor_repos": {"$gte": 200}}
+            get_commit_repos_by_query(db, query)
 
-main()
+type = "query"
+main(type)
