@@ -20,6 +20,7 @@ def add_commit (db, sha, full_name):
     if res:
         repo_list = res["repos"]
         if full_name in repo_list:
+            print "commit with sha already exist"
             return
         else:
             repo_list.append(full_name)
@@ -56,11 +57,6 @@ def get_commit_repos_by_query(db, query):
         i += 1
         print i
 
-        # since we already do it.. FIXME: remove it once finish the 'query' work
-        print item["login"]
-        if item["login"] == "torvalds":
-            continue
-
         if db["commit_check_meta_result"].find_one({"login": item["login"]}):
             print item["login"] + " already exist"
             continue
@@ -84,6 +80,7 @@ def get_commit_repos_by_user(db, user):
            print i
            #if the repo is already added, no need to re-generate that 
            if db["commit_check_meta_result"].find_one({"full_name": repo["full_name"]}):
+               print repo["full_name"] + "  already exist"
                continue
            get_commits(db, repo["full_name"], date_list)
            db["commit_check_meta_result"].insert({"full_name": repo["full_name"]})
@@ -91,15 +88,13 @@ def get_commit_repos_by_user(db, user):
 def get_commit_repos_by_users(db, user_list):
     for user in user_list:
         print user
-        # since we already do it.. FIXME: remove it once finish the 'query' work
-        if user == "torvalds":
-            continue
 
         if db["commit_check_meta_result"].find_one({"login": user}):
             print user + " already exist"
             continue
 
         get_commit_repos_by_user(db, user)
+        db["commit_check_meta_result"].insert({"login": user})
 
 def init_users_thread_by_query(db, query):
     pieces = 100
@@ -145,7 +140,7 @@ def run_task():
         item.start()
 
 def run_free_task(db, num):
-    query = {"col": "github", "num": num, "query": {"status": "init", "name": "get_commit_check"}}
+    query = {"col": "github", "num": num, "query": {"status": "running", "name": "get_commit_check"}}
     res = DMTask().getFreeTasks(query)
     i = 0
     for item in res:
@@ -176,7 +171,7 @@ def main(type):
         elif type == "run_task":
             run_free_task(db, 46)
 
-#type = "user"
+type = "user"
 type = "query"
 type = "init_task"
 type = "run_task"
