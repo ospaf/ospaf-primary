@@ -64,7 +64,7 @@ def get_dup_repos (db):
             if len(item["repos"]) == 0:
                 continue
             merge_repos_cache(db, item["repos"])
-            db["commit_check_result"].update({"_id": item["_id"]}, {"$set": {"visited": True}}})
+            db["commit_check_result"].update({"_id": item["_id"]}, {"$set": {"visited": True}})
 
 def main(type):
     timeout = 300
