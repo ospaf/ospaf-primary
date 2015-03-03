@@ -40,12 +40,13 @@ def merge_repo_cache(db, item, repos):
         else:
             repos_list.append(repo)
     print "update"
-    db["commit_repo_cache"].update({"_id": item["_id"]}, {"$set": {"repos": repos_list}})
+    count = len(repos_list)
+    db["commit_repo_cache"].update({"_id": item["_id"]}, {"$set": {"repos": repos_list, "count": count}})
 
 def add_repo_cache(db, repos):
     if len(repos) > 1:
         print "insert"
-        db["commit_repo_cache"].insert({"repos": repos})
+        db["commit_repo_cache"].insert({"repos": repos, "count": len(repos)})
 
 def get_dup_repos (db):
     res = db["commit_check_result"].find({"count":{"$gt": 1}, "visited":{"$exists": False}})
