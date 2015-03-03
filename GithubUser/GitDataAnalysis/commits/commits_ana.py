@@ -28,7 +28,7 @@ def get_top_commit_repos (db):
 #     if db has [a, b, c, d, e], count == 1, merge db with repos
 #     if db has [a, b, c, d, e], [a, f, g, h, j], [x, y, z] count >1, merge db[1], db[2], db[3] and repos
 def merge_repos_cache(db, repos):
-    res = db["commit_repo_cache"].find({"repos": {"$in": repos})
+    res = db["commit_repo_cache"].find({"repos": {"$in": repos}})
     count = res.count()
     if count > 0:
         repos_list = repos
@@ -58,7 +58,7 @@ def add_repo(db, repos):
         db["commit_repo_cache"].insert({"repos": repos, "count": len(repos)})
 
 def get_dup_repos (db):
-    res = db["commit_check_result"].find({"count":{"$gt": 1}, "visited":{"$exists": False}}).sort("count", pymongo.DESCENDING)
+    res = db["commit_check_result"].find({"count":{"$gt": 1}, "visited":{"$exists": False}}).sort("count", pymongo.DESCENDING).limit(100)
     if res:
         for item in res:
             merge = False
