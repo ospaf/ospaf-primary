@@ -24,45 +24,49 @@ def get_top_commit_repos (db):
                 break
 #            print item["repos"][0]
 
-def is_repo_cache(db, repo):
-#    return id, I sugguest
-    res = db["commit_repo_cache"].find_one({"repos": repo})
-    if res:
-        return res
-    else:
-        return None
+# repos: [a, b, x, t]
+#     if db has [a, b, c, d, e], count == 1, merge db with repos
+#     if db has [a, b, c, d, e], [a, f, g, h, j], [x, y, z] count >1, merge db[1], db[2], db[3] and repos
+def merge_repos_cache(db, repos):
+    res = db["commit_repo_cache"].find({"repos": {"$in": repos})
+    count = res.count()
+    if count > 0:
+        repos_list = repos
+        for item in res:
+            if count == 1:
+                merge_repo(db, item, repos)
+                return True
+            else:
+                repos_list += item["repos"]
+        for item in res:
+            db["commit_repo_cache"].remove({"_id": item["_id"]})        
+        repos_list = list(set(repos_list))
+        add_repo(db, repos_list)
+    elif count == 0:
+        add_repo(db, repos)
 
-def merge_repo_cache(db, item, repos):
-    repos_list = item["repos"]
-    for repo in repos:
-        if repo in repos_list:
-            continue
-        else:
-            repos_list.append(repo)
+def merge_repo(db, item, repos):
+    repos_list = item["repos"] + repos
+    repos_list = list(set(repos_list))
     print "update"
     count = len(repos_list)
     db["commit_repo_cache"].update({"_id": item["_id"]}, {"$set": {"repos": repos_list, "count": count}})
 
-def add_repo_cache(db, repos):
+def add_repo(db, repos):
     if len(repos) > 1:
         print "insert"
         db["commit_repo_cache"].insert({"repos": repos, "count": len(repos)})
 
 def get_dup_repos (db):
-    res = db["commit_check_result"].find({"count":{"$gt": 1}, "visited":{"$exists": False}})
+    res = db["commit_check_result"].find({"count":{"$gt": 1}, "visited":{"$exists": False}}).sort("count", pymongo.DESCENDING)
     if res:
         for item in res:
             merge = False
-            for repo in item["repos"]:
-                repo_cache_item = is_repo_cache(db, repo)
-                if repo_cache_item is None:
-                    pass
-                else:
-                    merge_repo_cache(db, repo_cache_item, item["repos"])
-                    merge = True
-                    break
+            if len(item["repos"]) == 0:
+                continue
+            merge_repos_cache(db, item["repos"]):
             if merge == False:
-                add_repo_cache(db, item["repos"])
+                add_repo(db, item["repos"])
             
 
 def main(type):
