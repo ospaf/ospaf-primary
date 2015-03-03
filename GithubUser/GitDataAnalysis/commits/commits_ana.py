@@ -58,16 +58,13 @@ def add_repo(db, repos):
         db["commit_repo_cache"].insert({"repos": repos, "count": len(repos)})
 
 def get_dup_repos (db):
-    res = db["commit_check_result"].find({"count":{"$gt": 1}, "visited":{"$exists": False}}).sort("count", pymongo.DESCENDING).limit(100)
+    res = db["commit_check_result"].find({"count":{"$gt": 1}, "visited":{"$exists": False}}).sort("count", pymongo.DESCENDING)
     if res:
         for item in res:
-            merge = False
             if len(item["repos"]) == 0:
                 continue
-            merge_repos_cache(db, item["repos"]):
-            if merge == False:
-                add_repo(db, item["repos"])
-            
+            merge_repos_cache(db, item["repos"])
+            db["commit_check_result"].update({"_id": item["_id"]}, {"$set": {"visited": True}}})
 
 def main(type):
     timeout = 300
