@@ -46,11 +46,12 @@ def merge_repos_cache(db, repos):
         add_repo(db, repos)
 
 def merge_repo(db, item, repos):
+    count_old = len(item["repos"])
     repos_list = item["repos"] + repos
     repos_list = list(set(repos_list))
-    print "update"
-    count = len(repos_list)
-    db["commit_repo_cache"].update({"_id": item["_id"]}, {"$set": {"repos": repos_list, "count": count}})
+    count_new = len(repos_list)
+    if count_new != count_old:
+        db["commit_repo_cache"].update({"_id": item["_id"]}, {"$set": {"repos": repos_list, "count": count_new}})
 
 def add_repo(db, repos):
     if len(repos) > 1:
@@ -59,12 +60,15 @@ def add_repo(db, repos):
 
 def get_dup_repos (db):
     res = db["commit_check_result"].find({"count":{"$gt": 1}, "visited":{"$exists": False}}).sort("count", pymongo.DESCENDING)
+    i = 0
     if res:
         for item in res:
+            i += 1
             if len(item["repos"]) == 0:
                 continue
             merge_repos_cache(db, item["repos"])
             db["commit_check_result"].update({"_id": item["_id"]}, {"$set": {"visited": True}})
+            print i
 
 def main(type):
     timeout = 300
