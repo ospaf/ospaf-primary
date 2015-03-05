@@ -49,7 +49,8 @@ class GithubCommit:
         info = self.task.getInfo()
         page = 1
         if info.has_key("current"):
-            page = info["current"]
+            page = info["current"] + 1
+            #TODO. since commit will be increasing, we need to get 'new ones'
             print "Find unfinished task, continue to work at " + str(page)
 
         while True:
@@ -96,4 +97,4 @@ def init_commit_task_by_user():
         for repo in repo_list:
             init_commit_task(db, repo["full_name"])
 
-init_commit_task_by_user()
+#init_commit_task_by_user()
