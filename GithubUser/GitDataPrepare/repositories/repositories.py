@@ -46,6 +46,10 @@ class GithubRepositories:
                     "default_branch", "network_count", "subscribers_count"]
         own_prop = ["login", "id", "type", "site_admin"]
 
+        if self.db["repositories"].find_one({"full_name": val["full_name"]}):
+            print "Exist"
+            return
+
         new_val = {"owner": {}}
         for item in key_prop:
             new_val[item] = val[item]
@@ -203,6 +207,8 @@ def init_repositories_task():
     start = 10300
 # end id is now set to 29000000
     end = 29000
+    start = 29000
+    end = 30900
     db = DMDatabase().getDB()
     for i in range (start, end):
         task = DMTask()
@@ -230,6 +236,8 @@ def resolve_event_loop_errors():
 # end id is now set to 10300000
     end = 29000
     count = 0
+    start = 29000
+    end = 30900
     for i in range (start, end):
         task = DMTask()
         val = {"name": "get_repositories", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
@@ -259,3 +267,4 @@ def resolve_event_errors():
 
 #init_repositories_task()
 #resolve_event_errors()
+

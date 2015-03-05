@@ -64,8 +64,13 @@ class GithubContributors:
             self.task.error({"full_name": full_name, "id": id, "message": "error in upload_contributors_contributors"})
         else:
             count = len(ret_val["val"])
-            print "insert " + full_name + "with " + str(count)
-            self.db["contributors"].insert({"full_name": full_name, "id": id, "contributors": ret_val["val"], 
+            print "insert " + full_name + " with " + str(count)
+            c_item = self.db["contributors"].find_one({"id": id})
+            if c_item:
+                self.db["contributors"].update({"_id": c_item["_id"]}, {"$set": {"contributors": ret_val["val"], 
+                                            "count": count, "update_date": datetime.datetime.utcnow()}})
+            else:
+                self.db["contributors"].insert({"full_name": full_name, "id": id, "contributors": ret_val["val"], 
                                             "count": count, "update_date": datetime.datetime.utcnow()})
             self.db["repositories"].update({"full_name": full_name, "id": id}, {"$set": {"contributors_count": count}})
 
@@ -130,20 +135,120 @@ class GithubContributors:
 
         last_id = start_id
 
-    def dupCheck(self, dup_list):
-        for item in dup_list:
-            res = self.db["contributors"].find({"id": item["id"]})
-            dup_con = []
-            last_id = 0
-#TODO, pop is ok..
-            for con_item in res:
-                if last_id == 0:
-                    last_id = 1
+    def runFix2Task(self):
+        if self.validateTask() == 0:
+            return
+        self.task.updateStatus("fix2-running")
+
+        info = self.task.getInfo()
+        start_id = info["start"]
+        end_id = info["end"]
+
+        con_query = {"id": {"$gte": start_id, "$lt": end_id}, "fork": False, "count": {"$gt": 0}}
+        con_res = self.db["contributors"].find(con_query).sort("id", pymongo.ASCENDING)
+        for item in con_res:
+            p = item["full_name"].find("/")
+            item_name = item["full_name"][p+1:-1]
+            for contributor in item["contributors"]:
+# contributor -- { "contributions" : 6, "login" : "Krzem0", "site_admin" : false, "type" : "User", "id" : 636186 }
+                user_res = self.db["user_contributor_result2"].find_one({"id": contributor["id"]})
+                if user_res:
+                    print "Update " + user_res["login"]
+                    contributor_commits = user_res["contributor_commits"]
+                    contributor_repos = user_res["contributor_repos"]
+                    repo_list = user_res["repo_list"]
+                    repo_changed = 0
+                    for repo_list_item in repo_list:
+                        p = repo_list_item["full_name"].find("/")
+                        repo_list_name = repo_list_item["full_name"][p+1:-1]
+                        # the repo is much like 'fork', but just without fork mark.. we choose the max commits one
+                        if item_name == repo_list_name:
+                            if repo_list_item["commits"] < contributor["contributions"]:
+                                # contributor_repos is not changed
+                                # contributor_repos += 0
+                                contributor_commits = user_res["contributor_commits"] - repo_list_item["commits"] + contributor["contributions"]
+                                repo_list_item["full_name"] = item["full_name"]
+                                repo_list_item["commits"] = contributor["contributions"]
+                                repo_changed = 1
+                                break
+                            else:
+                                repo_changed = 2
+                                break
+                    # no need to update
+                    if repo_changed == 2:
+                        continue
+                    # no exist repo found
+                    elif repo_changed == 0:
+                        contributor_repos += 1
+                        contributor_commits += contributor["contributions"]
+                        repo_list.append({"full_name": item["full_name"], "commits": contributor["contributions"]})
+
+                    self.db["user_contributor_result2"].update({"_id": user_res["_id"]}, {"$set": {"contributor_repos": contributor_repos, "contributor_commits": contributor_commits, "repo_list": repo_list}})
                 else:
-                    dup_con.append(con_item["_id"])
-            for con_item in dup_con:
-                print "\n------------------We find dup one!\n\n\n"
-                self.db["contributors"].remove({"_id": con_item})
+                    repo_list = [{"full_name": item["full_name"], "commits": contributor["contributions"]}]
+                    self.db["user_contributor_result2"].insert({"id": contributor["id"], "login": contributor["login"], "contributor_repos": 1, "contributor_commits": contributor["contributions"], "repo_list": repo_list})
+
+        self.task.update({"status": "fixed2"})
+        print "Fix2 task finish, exiting the thread"
+
+    def runFixTask(self):
+        if self.validateTask() == 0:
+            return
+        self.task.updateStatus("fix-running")
+
+        info = self.task.getInfo()
+        start_id = info["start"]
+        end_id = info["end"]
+
+        con_query = {"id": {"$gte": start_id, "$lt": end_id}, "fork": {"$exists": False}}
+        con_res = self.db["contributors"].find(con_query).sort("id", pymongo.ASCENDING)
+        con_list = []
+        for item in con_res:
+            con_list.append({"id": item["id"], "contributors": item["contributors"], "full_name": item["full_name"]})
+        con_len = len(con_list)
+        if con_len == 0:
+            self.task.update({"status": "fixed"})
+            print "Fix task finish, exiting the thread"
+            return
+
+        repo_query = {"id": {"$gte": start_id, "$lt": end_id}}
+        repo_res = self.db["repositories"].find(repo_query).sort("id", pymongo.ASCENDING)
+        repo_list = []
+        for item in repo_res:
+            repo_list.append({"id": item["id"], "fork": item["fork"]})
+        repo_len = len(repo_list)
+        repo_end = 0
+        i = 0
+        print str(con_len) + "  contributors  " + str(len(repo_list)) + " repos  - start " +  str(start_id) + "  end " + str(end_id)
+        while i < con_len:
+            while repo_end < repo_len and i <= repo_end:
+#               print "con " + str(con_list[i]["id"]) + "  repo  " + str(repo_list[repo_end]["id"])
+                if con_list[i]["id"] == repo_list[repo_end]["id"]:
+                    self.db["contributors"].update({"id": con_list[i]["id"]}, {"$set": {"fork": repo_list[repo_end]["fork"]}})
+                    if repo_list[repo_end]["fork"]:
+                        repo_end += 1
+                        break
+                    for user_item in con_list[i]["contributors"]:
+                        contributor_repos = 1
+                        contributor_commits = user_item["contributions"]
+                        user_res = self.db["user_contributor_result"].find_one({"id": user_item["id"]})
+                        if user_res:
+                            print "Update " + user_res["login"]
+                            if user_res.has_key("contributor_commits"):
+                                contributor_commits += user_res["contributor_commits"]
+                            if user_res.has_key("contributor_repos"):
+                                contributor_repos += user_res["contributor_repos"]
+                            self.db["user_contributor_result"].update({"_id": user_res["_id"]}, {"$set": {"contributor_repos": contributor_repos, "contributor_commits": contributor_commits}})
+                        else:
+                            self.db["user_contributor_result"].insert({"id": user_item["id"], "login": user_item["login"], "contributor_repos": contributor_repos, "contributor_commits": contributor_commits})
+#                    print str(con_list[i]["id"]) + " Updated"
+                    repo_end += 1
+                    break
+                else:
+                    repo_end += 1
+            i += 1
+        self.task.update({"status": "fixed"})
+        print "Fix task finish, exiting the thread"
 
     def runLoopTask(self):
         if self.validateTask() == 0:
@@ -156,25 +261,24 @@ class GithubContributors:
         end_id = info["end"]
 #Dliang marks this to do fix work...
         if info.has_key("current"):
-            start_id = info["current"]
+#FIXME
+#            start_id = info["current"]
             print "Find unfinished task, continue to work at " + str(start_id)
 
         query = {"id": {"$gte": start_id, "$lt": end_id}}
 
         res = self.db["repositories"].find(query).sort("id", pymongo.ASCENDING)
         res_list = []
-#        dup_check = []
         for item in res:
             if item.has_key("contributors_count"):
 #                print item["full_name"] + " already exist"
-#                dup_check.append({"full_name": item["full_name"], "id": item["id"]})
                 continue
             else:
                 res_list.append({"full_name": item["full_name"], "id": item["id"]})
 
-#        self.dupCheck(dup_check)
-
         res_len = len(res_list)
+#FIXME
+        print "Only " + str(res_len) + "  task remains"
         i = 0
         percent_gap = res_len/100
 
@@ -204,6 +308,8 @@ def init_contributors_task():
     start = 0
 # end id is now set to 29000000
     end = 29000
+    start = 29000
+    end = 30900
     db = DMDatabase().getDB()
     for i in range (start, end):
         task = DMTask()
@@ -236,32 +342,21 @@ def updated_contributors_task():
 #init_contributors_task()
 #resolve_contributors_loop_errors()
 
-def resolve_dup(db, start_id, end_id):
-    query = {"id": {"$gte": start_id, "$lt": end_id}}
-    res = db["contributors"].find(query).sort("id", pymongo.ASCENDING)
-    last_id = 0
-    count = 0
-    for item in res:
-        if last_id == 0:
-            last_id = item["id"]
-        else:
-            if last_id == item["id"]:
-                count += 1
-                print "remove " + item["full_name"]
-                db["contributors"].remove({"_id": item["_id"]})
-        last_id = item["id"]
-    return count
-
-def resolve_contributors_dups():
-    gap = 1000
-    start = 0
-    end = 29000
-    count = 0
+def resolve_contributors_30():
     db = DMDatabase().getDB()
-    for i in range (start, end):
-        i_count = resolve_dup(db, i*gap, (i+1)*gap)
-        count += 0
-        print str(i_count) + "  dups in " + str(start)
-    print "total + " + str(count) + " dups"
 
-#resolve_contributors_dups()
+    task1 = DMTask()
+    val = {"name": "fake-contributors", "action_type": "loop", "start": 0, "end": 1000}
+    task1.init_test("github", val)
+    e1 = GithubContributors(task1)
+
+    for num in range(1, 300):
+        res = db["contributors"].find({"count": num*30})
+        res_list = []
+        for item in res:
+            res_list.append({"full_name": item["full_name"], "id": item["id"]})
+        for item in res_list:
+            e1.get_repo_contributors(item["full_name"], item["id"])
+
+#resolve_contributors_30()
+#init_contributors_task()
