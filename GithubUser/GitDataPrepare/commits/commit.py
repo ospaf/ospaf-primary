@@ -56,7 +56,7 @@ class GithubCommit:
         while True:
             res = self.get_commit(page)
             if res["error"] == 1:
-                self.task.update({"status": "error", "current": page, "update_date": datetime.datetime.utcnow()})
+                self.task.update({"status": "error", "current": page-1, "update_date": datetime.datetime.utcnow()})
             elif len(res["val"]) == 0:
                 self.task.update({"status": "finish", "current": page, "update_date": datetime.datetime.utcnow()})
             else:
