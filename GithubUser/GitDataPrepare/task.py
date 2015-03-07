@@ -74,15 +74,15 @@ user_thread = []
 gap = 1000
 
 class myThread (threading.Thread):
-    def __init__(self, cmd, start, end, endless):
+    def __init__(self, action_type, cmd, start, end, endless):
         threading.Thread.__init__(self)
         self.endless = endless
-        self.set(cmd, start, end)
+        self.set(action_type, cmd, start, end)
 
-    def set(self, cmd, start, end):
+    def set(self,action_type, cmd, start, end):
         self.task = DMTask()
         self.r = None
-        self.val = {"action_type": "loop", "start": start, "end": end}
+        self.val = {"action_type": action_type, "start": start, "end": end}
         if cmd == "get_repos":
             self.val["name"] = "get_repos"
             self.task.init("github", self.val)
@@ -163,12 +163,13 @@ def main_loop():
     run_task()
 
 def run_free_task(num, endless):
-    query = {"col": "github", "num": num, "query": {"status": "init"}}
+#    query = {"col": "github", "num": num, "query": {"status": "init"}}
+    query = {"col": "github", "num": num, "query": {"start": "openstack"}}
 #    query = {"col": "github", "num": num, "query": {"status": "fixed", "name": "get_contributors"}}
     res = DMTask().getFreeTasks(query)
     i = 0
     for item in res:
-        new_thread = myThread(item["name"], item["start"], item["end"], endless)
+        new_thread = myThread(item["action_type"], item["name"], item["start"], item["end"], endless)
         user_thread.append(new_thread)
         i += 1
     print str(i) + " task received, start to run them!"
@@ -184,7 +185,7 @@ def main_free_task():
 
     print "Account has " + str(DMSharedUsers().getRemaining()) + " API calls"
     num = long(sys.argv[1])
-    endless = 1
+    endless = 0
     run_free_task(num, endless)
 
 main_free_task()

@@ -110,6 +110,31 @@ class GithubRepo:
         return 1
 
     def runTask(self):
+        info = self.task.getInfo()
+        if info["action_type"] == "loop":
+            self.runLoopTask()
+        elif info["action_type"] == "single":
+            self.runSingleTask()
+
+    def runSingleTask(self):
+        if self.task.updateStatus("running") != 0:
+            return
+
+        info = self.task.getInfo()
+        login = info["start"]
+
+        item = self.db["user"].find_one({"login": login})
+
+        r_count = item["public_repos"]
+        ret = self.upload_user_repos(item["login"], item["id"], r_count)
+        if ret == 1:
+#TODO make a better error message
+            self.task.error({"login": item["login"], "message": "error in upload_user_repo"})
+        else:
+            self.task.update({"status": "finish", "percent": 1.0, "update_date": datetime.datetime.utcnow()})
+        print "Task finish, exiting the thread"
+
+    def runLoopTask(self):
         if self.validateTask() == 0:
             return
         if self.task.updateStatus("running") != 0:
@@ -168,12 +193,25 @@ def init_repo_task():
     start = 0
 # end id is now set to 10300000
     end = 10300
+    start = 10300
+    end = 11030
+
     db = DMDatabase().getDB()
     for i in range (start, end):
         task = DMTask()
         val = {"name": "get_repos", "action_type": "loop", "start": i * gap, "end": (i+1)*gap}
         task.init("github", val)
 
+def init_repo_single_task(login):
+    db = DMDatabase().getDB()
+    task = DMTask()
+    item = db["user"].find_one({"login": login})
+    if item:
+        val = {"name": "get_repos", "action_type": "single", "start": login, "end": item["id"]}
+        task.init("github", val)
+    else:
+        print "user not found"
+    
 def test():
     task1 = DMTask()
     val = {"name": "fake-repo", "action_type": "loop", "start": 6001000, "end": 6005000}
@@ -247,5 +285,5 @@ def fix_add_login_one_by_one():
             print i
 
 #test()
-
-
+#init_repo_single_task("openstack")
+#init_repo_task()
