@@ -69,6 +69,14 @@ def get_commit_repos_by_query(db, query):
            db["commit_check_meta_result"].insert({"full_name": repo["full_name"]})
         db["commit_check_meta_result"].insert({"login": item["login"]})
 
+#TODO
+def get_commit_repos_by_user_repos(db, user):
+    res = db.user_repos.find_one({"login": user})
+    for item in res["repos"]:
+        if item["full_name"] == "openstack/openstack":
+            continue
+        print item["full_name"]
+
 def get_commit_repos_by_user(db, user):
     res =db["user_contributor_result2"].find_one({"login": user})
     if res:
@@ -107,13 +115,13 @@ def init_users_thread_by_query(db, query):
         user_list.append(item["login"])
         if i%pieces == 0:
             task = DMTask()
-            val = {"name": "get_commit_check", "action_type": "loop", "query": str(query), "users": user_list, "start": i-100, "end": i}
+            val = {"name": "get_commit_check", "action_type": "loop", "query": str(query), "users": user_list, "start": 800000 + i-100, "end": 800000 + i}
             task.init("github", val)
             user_list = []
 
     if i%pieces != 0:
         task = DMTask()
-        val = {"name": "get_commit_check", "action_type": "loop", "query": str(query), "users": user_list, "start": i-i%pieces, "end": 1}
+        val = {"name": "get_commit_check", "action_type": "loop", "query": str(query), "users": user_list, "start": 800000 + i-i%pieces, "end": 800000 + 1}
         task.init("github", val)
     return
 
@@ -135,6 +143,29 @@ class myThread (threading.Thread):
 
         print "Exist the thread"
 
+class myThread1 (threading.Thread):
+    def __init__(self, db, val):
+        threading.Thread.__init__(self)
+        self.db = db
+        self.val = val
+
+    def run(self):
+        print "Start the thread" + self.val
+        get_commit_repos_by_user(self.db, self.val)
+        print "Exist the thread"
+
+class myThread2 (threading.Thread):
+    def __init__(self, db, val):
+        threading.Thread.__init__(self)
+        self.db = db
+        self.val = val
+
+    def run(self):
+        print "Start the thread" + self.val
+        date_list = get_date_list()
+        get_commits(self.db, self.val, date_list)
+        print "Exist the thread"
+
 def run_task():
     for item in user_thread:
         item.start()
@@ -147,9 +178,57 @@ def run_free_task(db, num):
         new_thread = myThread(db, item)
         user_thread.append(new_thread)
         i += 1
-    print str(i) + " task received, start to run them!"
+    print str(i) + " task received, start to run them!\n\n\n\n"
     run_task()
 
+def get_unfinished_users(db):
+    client = DMDatabase().getClient()
+    res = client["task"]["github"].find({"status":"running", "name": "get_commit_check"})
+    users = []
+    for item in res:
+        for item_user in item["users"]:
+            if db["commit_check_meta_result"].find_one({"login": item_user}):
+                print "exist"
+            else:
+                users.append(item_user)
+
+    for user in users:
+        new_thread = myThread1(db, user)
+        user_thread.append(new_thread)
+    print str(len(users)) + " task received, start to run them!"
+    run_task()
+
+def get_unfinished_repos(db):
+    client = DMDatabase().getClient()
+    res = client["task"]["github"].find({"status":"running", "name": "get_commit_check"})
+    repos = []
+    for item in res:
+        for item_user in item["users"]:
+            if db["commit_check_meta_result"].find_one({"login": item_user}):
+                continue
+            else:
+                user_res =db["user_contributor_result2"].find_one({"login": item_user})
+                if user_res:
+                    repo_list = user_res["repo_list"]
+                    repos += repo_list
+    unfinish_repos = []
+    for item in repos:
+        unfinish_repos.append(item["full_name"])
+    unfinish_repos = list(set(unfinish_repos))
+    repos = []
+    for item in unfinish_repos:
+        if item.startswith("GITenberg/"):
+            continue
+        if db["commit_check_meta_result"].find_one({"full_name": item}):
+            continue
+        else:
+            repos.append(item)
+
+    for repo in repos:
+        new_thread = myThread2(db, repo)
+        user_thread.append(new_thread)
+    print str(len(repos)) + " task received, start to run them!"
+    run_task()
 
 def main(type):
     timeout = 300
@@ -162,17 +241,28 @@ def main(type):
         if type == "user":
             user = "torvalds"
             get_commit_repos_by_user(db, user)
+        if type == "user_repos":
+            user = "openstack"
+            get_commit_repos_by_user_repos(db, user)
         elif type == "query":
             query = {"contributor_repos": {"$gte": 200}}
             get_commit_repos_by_query(db, query)
         elif type == "init_task":
-            query = {"contributor_repos": {"$gte": 200}}
+            query = {"contributor_repos": {"$gte": 100, "$lt": 200}}
             init_users_thread_by_query(db, query)
         elif type == "run_task":
-            run_free_task(db, 46)
+            run_free_task(db, 60)
+        elif type == "un_user":
+            get_unfinished_users(db)
+        elif type == "un_repo":
+            get_unfinished_repos(db)
 
+
+type = "user_repos"
 type = "user"
 type = "query"
 type = "init_task"
 type = "run_task"
+type = "un_user"
+type = "un_repo"
 main(type)
