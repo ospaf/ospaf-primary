@@ -1,0 +1,123 @@
+4335
+{u'public_repos': 10, u'public_gists': 0, u'name': u'Yin Wang', u'created_at': u'2010-09-12T03:50:32Z', u'updated_at': u'2015-01-07T00:34:32Z', u'email': u'', u'blog': u'', u'followers': 4335, u'location': u'', u'following': 0, u'login': u'yinwang0', u'_id': ObjectId('54bb4876eb63292e4ac335ae'), u'type': u'User', u'id': 396124}
+
+
+4000
+{u'public_repos': 43, u'public_gists': 15, u'name': u'\u4e91\u98ce', u'created_at': u'2011-04-14T15:57:13Z', u'updated_at': u'2015-01-07T00:07:16Z', u'email': u'cloudwu@gmail.com', u'blog': u'http://blog.codingnow.com', u'followers': 4000, u'location': u'China', u'following': 1, u'login': u'cloudwu', u'_id': ObjectId('54bb486eeb63292e4ac32a15'), u'type': u'User', u'id': 729648}
+
+
+3684
+{u'public_repos': 6, u'public_gists': 7, u'name': u'lifesinger', u'created_at': u'2009-06-20T03:23:05Z', u'updated_at': u'2014-12-31T06:43:20Z', u'email': u'lifesinger@gmail.com', u'blog': u'', u'followers': 3684, u'location': u'Hangzhou, China', u'following': 8, u'login': u'lifesinger', u'_id': ObjectId('54bb4513eb63292e4abc32a9'), u'type': u'User', u'id': 97227}
+
+
+3375
+{u'public_repos': 55, u'public_gists': 5, u'name': u'Mu-An', u'created_at': u'2011-10-26T12:53:14Z', u'updated_at': u'2014-12-30T11:22:39Z', u'email': u'', u'blog': u'http://muan.co/', u'followers': 3375, u'location': u'Taipei, Taiwan', u'following': 53, u'login': u'muan', u'_id': ObjectId('54bb451ceb63292e4abc41ac'), u'type': u'User', u'id': 1153134}
+
+
+3298
+{u'public_repos': 153, u'public_gists': 70, u'name': u'Jackson Tian', u'created_at': u'2010-07-09T02:46:57Z', u'updated_at': u'2015-01-06T06:38:21Z', u'email': u'shyvo1987@gmail.com', u'blog': u'http://diveintonode.org/', u'followers': 3298, u'location': u'Hangzhou, China', u'following': 119, u'login': u'JacksonTian', u'_id': ObjectId('54bb4854eb63292e4ac2fe91'), u'type': u'User', u'id': 327019}
+
+
+2492
+{u'public_repos': 26, u'public_gists': 7, u'name': u'\u4ee3\u7801\u5bb6', u'created_at': u'2012-10-07T02:40:06Z', u'updated_at': u'2015-01-07T02:27:07Z', u'email': u'daimajia@gmail.com', u'blog': u'http://daimajia.com', u'followers': 2492, u'location': u'Beijing, China', u'following': 149, u'login': u'daimajia', u'_id': ObjectId('54bb4853eb63292e4ac2f8a0'), u'type': u'User', u'id': 2503423}
+
+
+2387
+{u'public_repos': 50, u'public_gists': 129, u'name': u'Yichun Zhang', u'created_at': u'2009-02-20T11:46:31Z', u'updated_at': u'2015-01-04T07:30:17Z', u'email': u'agentzh@gmail.com', u'blog': u'http://agentzh.org', u'followers': 2387, u'location': u'San Francisco, CA, USA', u'following': 3, u'login': u'agentzh', u'_id': ObjectId('54bb4820eb63292e4ac29e3d'), u'type': u'User', u'id': 56241}
+
+
+2193
+{u'public_repos': 30, u'public_gists': 33, u'name': u'Xinchen Hui', u'created_at': u'2010-09-01T02:25:00Z', u'updated_at': u'2015-01-05T01:58:37Z', u'email': u'laruence@php.net', u'blog': u'http://www.laruence.com', u'followers': 2193, u'location': u'China', u'following': 18, u'login': u'laruence', u'_id': ObjectId('54bb4827eb63292e4ac2a93f'), u'type': u'User', u'id': 382813}
+
+
+2142
+{u'public_repos': 52, u'public_gists': 9, u'name': u'astaxie', u'created_at': u'2010-03-31T06:07:58Z', u'updated_at': u'2014-12-30T09:29:57Z', u'email': u'xiemengjun@gmail.com', u'blog': u'', u'followers': 2142, u'location': u'Shanghai, China', u'following': 14, u'login': u'astaxie', u'_id': ObjectId('54bb44e0eb63292e4abbc9cd'), u'type': u'User', u'id': 233907}
+
+
+2140
+{u'public_repos': 25, u'public_gists': 87, u'name': u'\u5c0f\u9c7c', u'created_at': u'2009-11-14T10:24:24Z', u'updated_at': u'2015-01-06T05:25:19Z', u'email': u'sofish@icloud.com', u'blog': u'http://sofi.sh', u'followers': 2140, u'location': u'Shanghai China', u'following': 13, u'login': u'sofish', u'_id': ObjectId('54bb4855eb63292e4ac3000b'), u'type': u'User', u'id': 153183}
+
+
+1925
+{u'public_repos': 19, u'public_gists': 8, u'name': u'Trinea', u'created_at': u'2011-11-03T11:05:05Z', u'updated_at': u'2015-01-01T06:46:05Z', u'email': u'trinea.cn@gmail.com', u'blog': u'http://www.trinea.cn/', u'followers': 1925, u'location': u'Shanghai, China', u'following': 38, u'login': u'Trinea', u'_id': ObjectId('54bb46d3eb63292e4abff070'), u'type': u'User', u'id': 1169522}
+
+
+1825
+{u'public_repos': 16, u'public_gists': 1, u'name': u'Ruan YiFeng', u'created_at': u'2011-07-10T01:07:17Z', u'updated_at': u'2015-01-07T01:49:50Z', u'email': u'yifeng.ruan@gmail.com', u'blog': u'http://www.ruanyifeng.com', u'followers': 1825, u'location': u'Shanghai, China', u'following': 0, u'login': u'ruanyf', u'_id': ObjectId('54bb486eeb63292e4ac32b9a'), u'type': u'User', u'id': 905434}
+
+
+1802
+{u'public_repos': 22, u'public_gists': 31, u'name': u'Shuo Chen', u'created_at': u'2010-03-26T16:55:20Z', u'updated_at': u'2015-01-04T20:23:54Z', u'email': u'chenshuo@chenshuo.com', u'blog': u'blog.csdn.net/Solstice', u'followers': 1802, u'location': u'China', u'following': 7, u'login': u'chenshuo', u'_id': ObjectId('54bb4834eb63292e4ac2c4ee'), u'type': u'User', u'id': 231074}
+
+
+1669
+{u'public_repos': 63, u'public_gists': 67, u'name': u'Wei Wang', u'created_at': u'2011-09-01T16:27:21Z', u'updated_at': u'2015-01-04T11:46:03Z', u'email': u'onev@onevcat.com', u'blog': u'http://onev.cat', u'followers': 1669, u'location': u'Kawasaki, Japan', u'following': 97, u'login': u'onevcat', u'_id': ObjectId('54bb47baeb63292e4ac1ce86'), u'type': u'User', u'id': 1019875}
+
+
+1652
+{u'public_repos': 29, u'public_gists': 75, u'name': u'Jeffrey Zhao', u'created_at': u'2009-06-23T13:26:12Z', u'updated_at': u'2014-12-29T05:24:02Z', u'email': u'jeffz@live.com', u'blog': u'http://blog.zhaojie.me/', u'followers': 1652, u'location': u'China', u'following': 0, u'login': u'JeffreyZhao', u'_id': ObjectId('54bb44eeeb63292e4abbe7c3'), u'type': u'User', u'id': 98177}
+
+
+1593
+{u'public_repos': 128, u'public_gists': 54, u'name': u'Hsiaoming Yang', u'created_at': u'2010-05-29T07:05:44Z', u'updated_at': u'2014-12-30T17:06:33Z', u'email': u'', u'blog': u'http://lepture.com', u'followers': 1593, u'location': u'Everywhere, China', u'following': 71, u'login': u'lepture', u'_id': ObjectId('54b9ddd7eb63295a9ea52c67'), u'type': u'User', u'id': 290496}
+
+
+1537
+{u'public_repos': 69, u'public_gists': 0, u'name': u'\u53f8\u5f92\u6b63\u7f8e', u'created_at': u'2010-01-27T12:26:59Z', u'updated_at': u'2014-12-31T03:14:19Z', u'email': u'cheng19840218@gmail.com', u'blog': u'http://www.cnblogs.com/rubylouvre/', u'followers': 1537, u'location': u'China', u'following': 24, u'login': u'RubyLouvre', u'_id': ObjectId('54bb44f3eb63292e4abbed12'), u'type': u'User', u'id': 190846}
+
+
+1476
+{u'public_repos': 146, u'public_gists': 49, u'name': u'fengmk2', u'created_at': u'2009-11-21T08:07:35Z', u'updated_at': u'2015-01-07T03:37:16Z', u'email': u'fengmk2@cnpmjs.org', u'blog': u'http://fengmk2.github.com', u'followers': 1476, u'location': u'Hangzhou, China', u'following': 224, u'login': u'fengmk2', u'_id': ObjectId('54bb4874eb63292e4ac32f2d'), u'type': u'User', u'id': 156269}
+
+
+1399
+{u'public_repos': 83, u'public_gists': 114, u'name': u'Jason Lee', u'created_at': u'2008-04-07T05:44:36Z', u'updated_at': u'2015-01-06T09:46:49Z', u'email': u'huacnlee@gmail.com', u'blog': u'http://huacnlee.com', u'followers': 1399, u'location': u'Hangzhou,China', u'following': 166, u'login': u'huacnlee', u'_id': ObjectId('54bb4874eb63292e4ac32f26'), u'type': u'User', u'id': 5518}
+
+
+1349
+{u'public_repos': 56, u'public_gists': 49, u'name': u'Yihui Xie', u'created_at': u'2009-12-07T05:42:04Z', u'updated_at': u'2014-12-30T06:26:32Z', u'email': u'xie@yihui.name', u'blog': u'http://yihui.name', u'followers': 1349, u'location': u'Ames, IA', u'following': 46, u'login': u'yihui', u'_id': ObjectId('54b9defceb63295a9ea53170'), u'type': u'User', u'id': 163582}
+
+
+1302
+{u'public_repos': 3, u'public_gists': 0, u'name': u'July', u'created_at': u'2013-12-14T11:15:16Z', u'updated_at': u'2014-12-30T07:33:26Z', u'email': u'786165179@qq.com', u'blog': u'http://blog.csdn.net/v_july_v', u'followers': 1302, u'location': u'Beijing, China', u'following': 11, u'login': u'julycoding', u'_id': ObjectId('54bb45efeb63292e4abe121c'), u'type': u'User', u'id': 6184536}
+
+
+1299
+{u'public_repos': 8, u'public_gists': 4, u'name': u'Zihan Chen', u'created_at': u'2011-05-07T08:30:48Z', u'updated_at': u'2014-12-31T03:43:38Z', u'email': u'vczh@163.com', u'blog': u'http://www.gaclib.net', u'followers': 1299, u'location': u'Seattle, WA, USA', u'following': 2, u'login': u'vczh', u'_id': ObjectId('54bb44f6eb63292e4abbf8f7'), u'type': u'User', u'id': 773569}
+
+
+1259
+{u'public_repos': 29, u'public_gists': 0, u'name': u'Michael Liao', u'created_at': u'2010-11-06T12:21:35Z', u'updated_at': u'2015-01-06T05:34:26Z', u'email': u'askxuefeng@gmail.com', u'blog': u'http://www.liaoxuefeng.com', u'followers': 1259, u'location': u'Beijing, China', u'following': 0, u'login': u'michaelliao', u'_id': ObjectId('54bb485ceb63292e4ac30a68'), u'type': u'User', u'id': 470058}
+
+
+1203
+{u'public_repos': 26, u'public_gists': 21, u'name': u'Shaofei Cheng', u'created_at': u'2011-04-13T08:25:30Z', u'updated_at': u'2014-12-24T17:18:26Z', u'email': u'csf178@gmail.com', u'blog': u'http://winter-cn.cnblogs.com', u'followers': 1203, u'location': u'China', u'following': 19, u'login': u'wintercn', u'_id': ObjectId('54b9de07eb63295a9ea52e30'), u'type': u'User', u'id': 726566}
+
+
+1182
+{u'public_repos': 9, u'public_gists': 13, u'name': u'Xin Liu', u'created_at': u'2008-05-25T10:07:42Z', u'updated_at': u'2014-12-30T11:06:37Z', u'email': u'livid@v2ex.com', u'blog': u'http://www.v2ex.com/', u'followers': 1182, u'location': u'California', u'following': 10, u'login': u'livid', u'_id': ObjectId('54bb4512eb63292e4abc2fb8'), u'type': u'User', u'id': 11427}
+
+
+1143
+{u'public_repos': 34, u'public_gists': 11, u'name': u'\u9ec4\u5065\u5b8f', u'created_at': u'2010-12-26T11:34:35Z', u'updated_at': u'2015-01-06T08:19:42Z', u'email': u'huangz1990@gmail.com', u'blog': u'huangz.me', u'followers': 1143, u'location': u'', u'following': 0, u'login': u'huangz1990', u'_id': ObjectId('54bb4864eb63292e4ac316f5'), u'type': u'User', u'id': 536854}
+
+
+1138
+{u'public_repos': 27, u'public_gists': 11, u'name': u'\u8ff7\u6e21', u'created_at': u'2010-08-10T05:24:31Z', u'updated_at': u'2014-12-31T12:43:44Z', u'email': u'justjavac@gmail.com', u'blog': u'http://justjavac.com', u'followers': 1138, u'location': u'Tianjin, China', u'following': 79, u'login': u'justjavac', u'_id': ObjectId('54bb4505eb63292e4abc151f'), u'type': u'User', u'id': 359395}
+
+
+1121
+{u'public_repos': 21, u'public_gists': 2, u'name': u'Roger Wang', u'created_at': u'2009-12-10T07:51:41Z', u'updated_at': u'2014-12-30T13:50:54Z', u'email': u'roger@nwjs.io', u'blog': u'http://twitter.com/wwr', u'followers': 1121, u'location': u'Shanghai, China', u'following': 15, u'login': u'rogerwang', u'_id': ObjectId('54bb44feeb63292e4abc0826'), u'type': u'User', u'id': 165401}
+
+
+1109
+{u'public_repos': 65, u'public_gists': 24, u'name': u'Evan You', u'created_at': u'2010-11-28T01:05:40Z', u'updated_at': u'2015-01-07T09:12:25Z', u'email': u'yyx990803@gmail.com', u'blog': u'http://evanyou.me', u'followers': 1109, u'location': u'New Jersey / China', u'following': 74, u'login': u'yyx990803', u'_id': ObjectId('54bb487ceb63292e4ac33bbb'), u'type': u'User', u'id': 499550}
+
+
+1027
+{u'public_repos': 28, u'public_gists': 4, u'name': u'Cheng Zhao', u'created_at': u'2011-02-26T14:16:12Z', u'updated_at': u'2015-01-06T01:42:14Z', u'email': u'zcbenz@github.com', u'blog': u'http://cheng.guru', u'followers': 1027, u'location': u'San Francisco', u'following': 18, u'login': u'zcbenz', u'_id': ObjectId('54bb485deb63292e4ac30cac'), u'type': u'User', u'id': 639601}
+
+
+1002
+{u'public_repos': 22, u'public_gists': 9, u'name': u'stormzhang', u'created_at': u'2012-09-03T02:58:11Z', u'updated_at': u'2014-12-27T16:44:27Z', u'email': u'stormzhang.dev@gmail.com', u'blog': u'http://stormzhang.com', u'followers': 1002, u'location': u'Shanghai China', u'following': 65, u'login': u'stormzhang', u'_id': ObjectId('54bb4526eb63292e4abc53f3'), u'type': u'User', u'id': 2267900}
+
