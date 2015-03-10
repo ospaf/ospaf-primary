@@ -1,0 +1,80 @@
+10
+{u'public_repos': 4, u'public_gists': 0, u'name': u'leijitang', u'created_at': u'2014-07-22T07:20:19Z', u'updated_at': u'2014-12-23T00:07:50Z', u'email': u'leijitang@huawei.com', u'blog': u'', u'followers': 0, u'location': u'Hangzhou,China', u'following': 3, u'login': u'coolljt0725', u'_id': ObjectId('54bb4716eb63292e4ac083cc'), u'type': u'User', u'id': 8232360}
+
+
+7
+{u'public_repos': 99, u'public_gists': 5, u'name': u'Liang-Chi Hsieh', u'created_at': u'2009-03-31T08:29:07Z', u'updated_at': u'2014-12-30T07:44:58Z', u'email': u'viirya@viirya.org', u'blog': u'http://www.viirya.org', u'followers': 22, u'location': u'Taipei, Taiwan', u'following': 0, u'login': u'viirya', u'_id': ObjectId('54bb450beb63292e4abc23ef'), u'type': u'User', u'id': 68855}
+
+
+6
+{u'public_repos': 5, u'public_gists': 0, u'created_at': u'2014-11-26T06:28:11Z', u'updated_at': u'2014-12-28T22:05:40Z', u'followers': 0, u'following': 0, u'login': u'HuKeping', u'_id': ObjectId('54bb4761eb63292e4ac11cf3'), u'type': u'User', u'id': 9958621}
+
+
+6
+{u'public_repos': 2, u'public_gists': 0, u'name': u'Qiang Huang', u'created_at': u'2014-01-16T02:37:35Z', u'updated_at': u'2014-12-30T09:52:52Z', u'email': u'h.huangqiang@huawei.com', u'blog': None, u'followers': 1, u'location': u'China-Hangzhou', u'following': 0, u'login': u'hqhq', u'_id': ObjectId('54bb45e5eb63292e4abdff01'), u'type': u'User', u'id': 6415670}
+
+
+6
+{u'public_repos': 5, u'public_gists': 1, u'name': u'Shuai Zhang', u'created_at': u'2014-02-17T06:08:24Z', u'updated_at': u'2014-12-25T05:25:59Z', u'email': u'', u'blog': u'', u'followers': 0, u'location': u'', u'following': 0, u'login': u'shuai-z', u'_id': ObjectId('54bb4646eb63292e4abec591'), u'type': u'User', u'id': 6701760}
+
+
+5
+{u'public_repos': 41, u'public_gists': 13, u'name': u'Brandon Liu', u'created_at': u'2009-04-24T19:45:49Z', u'updated_at': u'2015-01-04T16:29:19Z', u'email': u'bdon@bdon.org', u'blog': u'http://bdon.org', u'followers': 70, u'location': u'YEAH!', u'following': 49, u'login': u'bdon', u'_id': ObjectId('54bb484beb63292e4ac2ecd4'), u'type': u'User', u'id': 77501}
+
+
+4
+{u'public_repos': 55, u'public_gists': 14, u'name': u'Huayi Zhang', u'created_at': u'2011-02-02T06:35:00Z', u'updated_at': u'2014-12-28T12:45:42Z', u'email': u'huayizhang@me.com', u'blog': u'irachex.com', u'followers': 95, u'location': u'China', u'following': 94, u'login': u'irachex', u'_id': ObjectId('54b9de49eb63295a9ea52f31'), u'type': u'User', u'id': 596262}
+
+
+4
+{u'public_repos': 24, u'public_gists': 0, u'name': u'Bai, Yang', u'created_at': u'2009-06-13T09:52:11Z', u'updated_at': u'2014-12-30T12:17:20Z', u'email': u'hamo.by@gmail.com', u'blog': None, u'followers': 8, u'location': None, u'following': 0, u'login': u'hamo', u'_id': ObjectId('54bb4513eb63292e4abc30ce'), u'type': u'User', u'id': 94987}
+
+3
+{u'public_repos': 91, u'public_gists': 0, u'created_at': u'2012-03-06T15:28:54Z', u'updated_at': u'2014-12-30T05:14:23Z', u'followers': 5, u'following': 5, u'login': u'zhgwenming', u'_id': ObjectId('54bb47d9eb63292e4ac20c10'), u'type': u'User', u'id': 1507590}
+
+2
+{u'public_repos': 47, u'public_gists': 7, u'name': u'Carl X. Su', u'created_at': u'2009-10-06T11:31:05Z', u'updated_at': u'2014-12-22T18:39:24Z', u'email': None, u'blog': None, u'followers': 39, u'location': u'Taipei City, Taiwan', u'following': 7, u'login': u'bcbcarl', u'_id': ObjectId('54bb486deb63292e4ac32863'), u'type': u'User', u'id': 135734}
+
+
+2
+{u'public_repos': 5, u'public_gists': 0, u'name': u'Dawn Chen', u'created_at': u'2014-05-29T23:03:51Z', u'updated_at': u'2014-12-30T00:46:54Z', u'email': u'dawnchen@google.com', u'blog': u'', u'followers': 9, u'location': u'United States', u'following': 5, u'login': u'dchen1107', u'_id': ObjectId('54bb4697eb63292e4abf68b7'), u'type': u'User', u'id': 7740897}
+
+
+2
+{u'public_repos': 58, u'public_gists': 18, u'name': u'Lance Chen', u'created_at': u'2012-03-29T14:24:01Z', u'updated_at': u'2014-12-29T03:51:22Z', u'email': u'cyen0312+github@gmail.com', u'blog': u'http://blog.lance.tw', u'followers': 9, u'location': u'Taiwan', u'following': 5, u'login': u'Lance0312', u'_id': ObjectId('54bb47c3eb63292e4ac1e17d'), u'type': u'User', u'id': 1587305}
+
+
+2
+{u'public_repos': 47, u'public_gists': 5, u'name': u'Song Gao', u'created_at': u'2010-04-28T13:53:21Z', u'updated_at': u'2014-12-31T05:05:20Z', u'email': u'song@gao.io', u'blog': u'https://song.gao.io/', u'followers': 44, u'location': u'Auburn, AL', u'following': 73, u'login': u'songgao', u'_id': ObjectId('54bb450aeb63292e4abc1c8f'), u'type': u'User', u'id': 255797}
+
+
+1
+{u'public_repos': 60, u'public_gists': 36, u'name': u'Aaron Feng', u'created_at': u'2008-03-31T00:45:11Z', u'updated_at': u'2015-01-05T21:59:40Z', u'email': u'aaron@forty9ten.com', u'blog': u'http://twitter.com/aaronfeng', u'followers': 59, u'location': u'Philadelphia | Atlanta', u'following': 48, u'login': u'aaronfeng', u'_id': ObjectId('54bb4854eb63292e4ac2fc2b'), u'type': u'User', u'id': 4152}
+
+
+1
+{u'public_repos': 23, u'public_gists': 5, u'created_at': u'2012-12-07T16:14:11Z', u'updated_at': u'2014-12-17T04:53:03Z', u'followers': 0, u'following': 5, u'login': u'ArikaChen', u'_id': ObjectId('54bb45d9eb63292e4abde273'), u'type': u'User', u'id': 2990337}
+
+
+1
+{u'public_repos': 3, u'public_gists': 0, u'name': u'Chen Hanxiao', u'created_at': u'2015-01-26T02:48:07Z', u'updated_at': u'2015-02-17T03:25:04Z', u'email': u'', u'blog': u'', u'followers': 0, u'location': u'', u'following': 0, u'login': u'chenhanxiao', u'_id': ObjectId('54fe9961eb632922df7944b6'), u'type': u'User', u'id': 10702304}
+
+
+1
+{u'public_repos': 168, u'public_gists': 70, u'name': u'Chia-liang Kao', u'created_at': u'2009-04-02T10:07:27Z', u'updated_at': u'2014-12-30T19:18:54Z', u'email': u'clkao@clkao.org', u'blog': u'www.clkao.org', u'followers': 344, u'location': u'Taipei, Taiwan', u'following': 74, u'login': u'clkao', u'_id': ObjectId('54bb450beb63292e4abc20f6'), u'type': u'User', u'id': 69736}
+
+
+1
+{u'public_repos': 19, u'public_gists': 4, u'name': u'Chun Chen', u'created_at': u'2011-08-17T10:51:27Z', u'updated_at': u'2015-01-03T09:41:37Z', u'email': u'ramichen@tencent.com', u'blog': u'', u'followers': 16, u'location': u'', u'following': 23, u'login': u'chenchun', u'_id': ObjectId('54bb485aeb63292e4ac3033e'), u'type': u'User', u'id': 985861}
+
+1
+{u'public_repos': 56, u'public_gists': 31, u'name': u'Daniel YC Lin', u'created_at': u'2010-07-08T08:21:08Z', u'updated_at': u'2014-12-23T16:17:59Z', u'email': None, u'blog': None, u'followers': 4, u'location': u'Taipei,Taiwan', u'following': 0, u'login': u'dlintw', u'_id': ObjectId('54bb4512eb63292e4abc2d39'), u'type': u'User', u'id': 326179}
+
+
+1
+{u'public_repos': 72, u'public_gists': 20, u'name': u'Deshi Xiao', u'created_at': u'2008-12-02T02:06:21Z', u'updated_at': u'2014-12-30T05:01:42Z', u'email': u'xiaods@gmail.com', u'blog': u'http://coderchina.tumblr.com/', u'followers': 127, u'location': u'beijing', u'following': 21, u'login': u'xiaods', u'_id': ObjectId('54bb484beb63292e4ac2ef3b'), u'type': u'User', u'id': 37678}
+
+
+1
+{u'public_repos': 12, u'public_gists': 9, u'name': u'', u'created_at': u'2008-11-05T08:36:14Z', u'updated_at': u'2014-12-17T04:53:02Z', u'email': u'', u'blog': u'http://xerr.net/', u'followers': 50, u'location': u'Beijing, China', u'following': 4, u'login': u'georgexsh', u'_id': ObjectId('54bb4511eb63292e4abc2ccb'), u'type': u'User', u'id': 32751}
+
