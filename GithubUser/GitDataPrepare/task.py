@@ -70,6 +70,7 @@ def main_unit():
     elif cmd == "gen-event":
         gen_event(start, end)
 
+threadLock = threading.Lock()
 user_thread = []
 gap = 1000
 
@@ -112,6 +113,10 @@ class myThread (threading.Thread):
             self.val["name"] = "get_commit"
             self.task.init("github", self.val)
             self.r = GithubCommit(self.task)
+        elif cmd == "get_commit_p1":
+            self.val["name"] = "get_commit_p1"
+            self.task.init("github", self.val)
+            self.r = GithubCommit(self.task)
         else:
             print "Failed to init the task"
             return 0
@@ -128,7 +133,9 @@ class myThread (threading.Thread):
             while 1:
                 query = {"col": "github", "num": 1, "query": {"status": "init"}}
 #                query = {"col": "github", "num": 1, "query": {"status": "fixed", "name": "get_contributors"}}
+                threadLock.acquire()
                 res = DMTask().getFreeTasks(query)
+                threadLock.release()
                 if res:
                     for item in res:
                         print item
@@ -163,8 +170,8 @@ def main_loop():
     run_task()
 
 def run_free_task(num, endless):
-#    query = {"col": "github", "num": num, "query": {"status": "init"}}
-    query = {"col": "github", "num": num, "query": {"start": "openstack"}}
+    query = {"col": "github", "num": num, "query": {"status": "init", "name": "get_repos"}}
+    query = {"col": "github", "num": num, "query": {"name": "get_repositories", "status":"init"}}
 #    query = {"col": "github", "num": num, "query": {"status": "fixed", "name": "get_contributors"}}
     res = DMTask().getFreeTasks(query)
     i = 0

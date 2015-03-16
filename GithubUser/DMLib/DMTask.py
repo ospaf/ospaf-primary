@@ -125,7 +125,42 @@ class DMTask:
             query = req["query"]
         else:
             query["status"] = "init"
-        return DMTask.__task_db__[req["col"]].find(query).sort("percent", pymongo.ASCENDING).limit(req["num"])
+        res = DMTask.__task_db__[req["col"]].find(query).sort("percent", pymongo.ASCENDING).limit(req["num"])
+        ret_val = []
+        for item in res:
+            ret_val.append(item)
+#This could improve the conflict possibility
+            DMTask.__task_db__[req["col"]].update({"_id": item["_id"]}, {"$set": {"status": "locked"}})
+        return ret_val
+
+    def fixConTasks(self):
+        res = DMTask.__task_db__["github"].find({"status": "running", "name": "get_contributors"})
+        for item in res:
+            id = item["_id"]
+            if item.has_key("current"):
+                start = item["start"]
+                end = item["end"]
+                current = item["current"]
+                if current >= start+1000:
+                    print "Wrong fixed"
+                    DMTask.__task_db__["github"].update({"_id": id}, {"$set": {"status": "finish"}})
+
+    def fixUserTasks(self):
+        res = DMTask.__task_db__["github"].find({"status": "running", "name": "get_users"})
+        for item in res:
+            id = item["_id"]
+            if item.has_key("current"):
+                start = item["start"]
+                end = item["end"]
+                current = item["current"]
+                if current >= start+1000:
+                    DMTask.__task_db__["github"].update({"_id": id}, {"$set": {"status": "finish"}})
+                else:
+                    print "Wrong end"
+                    DMTask.__task_db__["github"].update({"_id": id}, {"$set": {"status": "init", "end": start+1000, "current": start}})
+            else:
+                continue
+                DMTask.__task_db__["github"].update({"_id": id}, {"$set": {"status": "init"}})
 
     def fixRepoTasks(self):
         res = DMTask.__task_db__["github"].find({"status": "running", "name": "get_repositories"})
@@ -144,7 +179,7 @@ class DMTask:
             else:
                 continue
                 DMTask.__task_db__["github"].update({"_id": id}, {"$set": {"status": "init"}})
-
+        return
         print "--------------------------------"
         res = DMTask.__task_db__["github"].find({"status": "finish", "name": "get_repositories"})
         for item in res:
@@ -202,6 +237,7 @@ def test2():
 
 def test3():
     repo_task = DMTask()
-    repo_task.fixRepoTasks()
+#    repo_task.fixRepoTasks()
+    repo_task.fixConTasks()
 
-#test3()
+test3()
