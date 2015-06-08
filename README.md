@@ -21,6 +21,8 @@ Send bug reports to garvinli@garvinli.com.
  - [Source Of Data](reference/SourceOfData.md)
  - [Connect Database](reference/ConnectDatabas.md)
  - [Achieve Model](reference/AchieveModel.md)
+## Papers published
 
+To get the specific information about OSPAF, we recommend you to view our [paper](https://github.com/ospaf/document/blob/master/ospaf_paper.pdf).
 - - -
 Copyright 2014 Ospaf Lab Software, Inc. Unless otherwise marked, this work is licensed under a [Creative Commons Attribution 3.0 Unported License](http://creativecommons.org/licenses/by/3.0/).
